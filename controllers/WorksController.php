@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\File;
 use Yii;
 use app\models\StudentWorks;
 use app\models\search\StudentWorksSearch;
@@ -51,11 +52,11 @@ class WorksController extends Controller
 				$ownStudents    = User::find()->where(['structure_id' => $structure_id])
 				                      ->andWhere(['role_id' => User::ROLE_STUDENT])->asArray()->All();
 				$ownStudentsIds = ArrayHelper::map($ownStudents, 'user_id', 'phio');
-				$custom_query   = StudentWorks::find()->where(['author_id' => array_keys($ownStudentsIds)]);
+				$custom_query   = StudentWorks::find()->where([StudentWorks::tableName().'.author_id' => array_keys($ownStudentsIds)]);
 				break;
 
 			case User::ROLE_STUDENT:
-				$custom_query = StudentWorks::find()->where(['author_id' => Yii::$app->user->id]);
+				$custom_query = StudentWorks::find()->where([StudentWorks::tableName().'.author_id' => Yii::$app->user->id]);
 
 //				return $this->redirect(['studentworks', 'id' => Yii::$app->user->id]);
 				break;
@@ -122,22 +123,14 @@ class WorksController extends Controller
 		$initialPreview = [];
 		$initialPreviewConfig = [];
 
-		if(is_array($model->filename)){
-			foreach($model->filename as $key => $file){
-				array_push($initialPreview,
-					Html::a(Html::tag('i','',['class'=>'glyphicon glyphicon-file']) . ' ' . $model->title . '_' . ($key+1),
-						Url::to(['/works/getfile', 'file'=>$key+1, 'work_id'=>$model->work_id]),
-						//['class'=>'file-preview-image']
-						[]
-					)
-				);
-				array_push($initialPreviewConfig,['url' => '/works/deletefile','key'=>$key+1, 'extra'=>['work_id'=>$model->work_id]]);
-			}
+		foreach($model->files as $file){
+			array_push($initialPreview,
+				Html::a(Html::tag('i','',['class'=>'glyphicon glyphicon-file']) . ' ' . $file->real_name,
+					Url::to(['/works/getfile', 'file'=>$file->file_id])
+				)
+			);
+			array_push($initialPreviewConfig,['url' => '/works/deletefile','key'=>$file->file_id]);
 		}
-
-
-
-
 
 		return $this->render('view', [
 			'model' => $model,
@@ -155,25 +148,17 @@ class WorksController extends Controller
 		$model = new StudentWorks();
 		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
 			$files = UploadedFile::getInstances($model, 'filename');
-
-
-
+			if($model->save()) {
 			foreach ($files as $file) {
-				$file->saveAs($model->getFilePath($file));
+				$model->addFile($file);
 			}
-
-			$role_id = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
-			if ($role_id == User::ROLE_STUDENT) {
-				$model->status = StudentWorks::STATUS_NEW;
+				return $this->redirect(['view', 'id' => $model->work_id]);
+			} else {
+				return $this->refresh();
 			}
-
-			$model->save();
-
-			return $this->redirect(['view', 'id' => $model->work_id]);
 		} else {
 			$initialPreview = [];
 			$initialPreviewConfig = [];
-
 
 			return $this->render('create', [
 				'model' => $model,
@@ -198,12 +183,7 @@ class WorksController extends Controller
 			$files = UploadedFile::getInstances($model, 'filename');
 
 			foreach ($files as $file) {
-				$file->saveAs($model->getFilePath($file));
-			}
-
-			$role_id = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
-			if ($role_id == User::ROLE_STUDENT) {
-				$model->status = StudentWorks::STATUS_NEW;
+				$model->addFile($file);
 			}
 
 			$model->save();
@@ -213,19 +193,15 @@ class WorksController extends Controller
 			$initialPreview = [];
 			$initialPreviewConfig = [];
 
-			if(is_array($model->filename)){
-				foreach($model->filename as $key => $file){
-					array_push($initialPreview,
-						Html::img(
-							Url::to(['/works/getfile', 'file'=>$key+1, 'work_id'=>$model->work_id]),
-							['class'=>'file-preview-image', 'alt'=>'The Moon', 'title'=>'The Moon']
-						)
-					);
-					array_push($initialPreviewConfig,['url' => '/works/deletefile','key'=>$key+1, 'extra'=>['work_id'=>$model->work_id]]);
-				}
+			foreach($model->files as $file){
+				array_push($initialPreview,
+					Html::img(
+						Url::to(['/works/getfile', 'file'=>$file->file_id]),
+						['class'=>'file-preview-image', 'alt'=>'The Moon', 'title'=>'The Moon']
+					)
+				);
+				array_push($initialPreviewConfig,['url' => '/works/deletefile','key'=>$file->file_id]);
 			}
-
-
 
 			return $this->render('update', [
 				'model' => $model,
@@ -243,8 +219,6 @@ class WorksController extends Controller
 
 			return $this->redirect(['view', 'id' => $model->work_id]);
 		} else {
-			die('test');
-
 			return $this->redirect(['view', 'id' => $model->work_id]);
 		}
 	}
@@ -281,30 +255,18 @@ class WorksController extends Controller
 		}
 	}
 
-	public function actionGetfile($file, $work_id){
-		$model = $this->findModel($work_id);
-
-		/*echo $folder;
-		echo "<br>";
-		echo $file . "<br><br>";*/
-
-		$filePath = $model->filename[$file-1];
-		header('Content-Description: File Transfer');
-		header('Content-Type: application/octet-stream');
-		header('Content-Disposition: attachment; filename="'."{$model->getAuthorName()}_{$model->title}_$file.". pathinfo($filePath, PATHINFO_EXTENSION) . '"');
-		header('Expires: 0');
-		header('Cache-Control: must-revalidate');
-		header('Pragma: public');
-		header('Content-Length: ' . filesize($filePath));
-		readfile($filePath);
-		exit;
+	public function actionGetfile($file){
+		$file = File::findOne($file);
+		$model = $file->work;
+		$ext = pathinfo($file->path, PATHINFO_EXTENSION);
+		$name = "{$model->getAuthorName()}_{$file->real_name}.{$ext}";
+		Yii::$app->response->sendFile($file->path, $name);
 	}
 
 	public function actionDeletefile() {
-		$model = $this->findModel(Yii::$app->request->post('work_id'));
-		$model->deleteFile(Yii::$app->request->post('key'));
-		$model->save();
-
+		$file = File::findOne(Yii::$app->request->post('key'));
+		$model = $file->work;
+		$file->delete();
 		return true;
 	}
 }

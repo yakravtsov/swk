@@ -13,24 +13,24 @@ use yii\web\UploadedFile;
 /**
  * This is the model class for table "student_works".
  *
- * @property string  $created
- * @property string  $updated
- * @property integer $author_id
- * @property integer $work_id
- * @property string  $filename
- * @property string  $title
- * @property integer $type
- * @property integer $mark
- * @property string  $comment
- * @property integer $discipline_id
- * @property integer $student_id
- * @property integer $status
- * @property User 	 $author
+ * @property string   $created
+ * @property string   $updated
+ * @property integer  $author_id
+ * @property integer  $work_id
+ * @property string   $filename
+ * @property string   $title
+ * @property integer  $type
+ * @property integer  $mark
+ * @property string   $comment
+ * @property integer  $discipline_id
+ * @property integer  $student_id
+ * @property integer  $status
+ * @property User     $author
  *
- * @property User    $student
+ * @property User     $student
+ * @property File[]    files
  */
-class StudentWorks extends ActiveRecord
-{
+class StudentWorks extends ActiveRecord {
 
 	const TYPE_REFERAT        = 1;
 	const TYPE_COURSEWORK     = 2;
@@ -87,11 +87,14 @@ class StudentWorks extends ActiveRecord
 	 */
 	public function rules() {
 		return [
-			[[/*'filename', 'type',
-			  'mark',*/
-			  'discipline_id'/*, 'student_id'*/,'title'], 'required'],
-			[['type', 'mark', 'discipline_id', 'student_id', 'status'], 'integer'],
-			[['comment'], 'string'],
+			[['discipline_id', 'title'], 'required'],
+			[['type', 'discipline_id', 'student_id', 'status'], 'integer'],
+			[['status'], 'default', 'value'=> self::STATUS_NEW, 'when' => function ($model) {
+					/** @var $model self */
+					return $model->isNewRecord || Yii::$app->user->identity->role_id == User::ROLE_STUDENT;
+				}],
+			[['title'], 'trim'],
+			[['comment', 'title'], 'string'],
 		];
 	}
 
@@ -112,7 +115,7 @@ class StudentWorks extends ActiveRecord
 			'student_id'    => 'Выполнил',
 			'teacher_id'    => 'Проверил',
 			'status'        => 'Статус',
-			'title'        => 'Название',
+			'title'         => 'Название',
 		];
 	}
 
@@ -143,46 +146,6 @@ class StudentWorks extends ActiveRecord
 		];
 	}
 
-	public function afterFind() {
-		$this->filename = unserialize($this->filename);
-
-		return parent::afterFind();
-	}
-
-	public function beforeSave($insert = true) {
-		$this->filename = serialize($this->filename);
-
-		return parent::beforeSave($insert);
-	}
-
-	public function getFilePath(UploadedFile $file) {
-		$md5_file            = md5_file($file->tempName);
-		$md5 = md5(Yii::$app->user->identity->email . Yii::$app->user->identity->created);
-		$route          = substr($md5, 0, 3) . '/' . substr($md5, 3, 3) . '/';
-		$dir            = Yii::$app->getBasePath() . '/data/' . $route;
-		if (!is_dir($dir)) {
-			mkdir($dir, 0777, TRUE);
-			if (is_dir($dir)) {
-				Yii::info("image service create directory $dir");
-			} else {
-				Yii::warning("image service create directory fail $dir");
-			}
-		}
-		$filePath = $dir . substr($md5_file, 6) . '.' . $file->getExtension();
-		$this->_addFile($filePath);
-		//echo $filePath;
-
-		//die($filePath);
-
-		return $filePath;
-	}
-
-	private function _addFile($file) {
-		$files = $this->filename;
-		array_push($files, $file);
-		$this->filename = $files;
-	}
-
 	public function getStatusLabel() {
 		$keys = $this->getStatusValues();
 
@@ -202,12 +165,13 @@ class StudentWorks extends ActiveRecord
 		return $keys;
 	}
 
-	public function getStatusClass(){
+	public function getStatusClass() {
 		$statusClasses = [
 			self::STATUS_NEW       => 'info',
 			self::STATUS_CONFIRMED => 'success',
 			self::STATUS_REJECTED  => 'danger',
 		];
+
 		return array_key_exists($this->status, $statusClasses) ? $statusClasses[$this->status] : 'default';
 	}
 
@@ -243,7 +207,7 @@ class StudentWorks extends ActiveRecord
 	}
 
 	public function getAllauthors() {
-		return $this->hasMany(User::className(), ['author_id' => 'author_id'])/*
+		return $this->hasMany(User::className(), ['author_id' => 'author_id']) /*
 		            ->viaTable('project_company', ['project_id' => 'project_id'])*/
 			;
 	}
@@ -252,15 +216,28 @@ class StudentWorks extends ActiveRecord
 		return $this->author_id;
 	}
 
-	public function deleteFile($param) {
-		@unlink($this->filename[$param-1]);
-		$other = [];
-		foreach ($this->filename as $key=>$file) {
-			if($key<>$param-1) {
-				$other[] = $file;
-			}
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getFiles() {
+		return $this->hasMany(File::className(), ['work_id' => 'work_id']);
+	}
+
+	public function addFile(UploadedFile $file) {
+		$model       = new File;
+		$model->processFile($file);
+		$this->link('files', $model);
+		$r = $model->save();
+		Yii::$app->session->addFlash($model->path, $r);
+
+		return $r;
+	}
+
+	public function beforeDelete() {
+		foreach($this->files as $file) {
+			$file->delete();
 		}
 
-		$this->filename = $other;
+		return parent::beforeDelete();
 	}
 }
