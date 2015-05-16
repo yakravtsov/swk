@@ -7,28 +7,30 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
+use yii\validators\FileValidator;
 use yii\web\UploadedFile;
 
 /**
  * This is the model class for table "student_works".
  *
- * @property string   $created
- * @property string   $updated
- * @property integer  $author_id
- * @property integer  $work_id
- * @property string   $filename
- * @property string   $title
- * @property integer  $type
- * @property integer  $mark
- * @property string   $comment
- * @property integer  $discipline_id
- * @property integer  $student_id
- * @property integer  $status
- * @property User     $author
+ * @property string    $created
+ * @property string    $updated
+ * @property integer   $author_id
+ * @property integer   $work_id
+ * @property string    $filename
+ * @property string    $title
+ * @property integer   $type
+ * @property integer   $mark
+ * @property string    $comment
+ * @property integer   $discipline_id
+ * @property integer   $student_id
+ * @property integer   $status
+ * @property User      $author
  *
- * @property User     $student
- * @property File[]    files
+ * @property User      $student
+ * @property File[]    $files
  */
 class StudentWorks extends ActiveRecord {
 
@@ -56,6 +58,8 @@ class StudentWorks extends ActiveRecord {
 	const DISCIPLINE_RESEARCH  = 2;
 	const DISCIPLINE_COMMUNITY = 4;
 	const DISCIPLINE_CULTURAL  = 8;
+
+	public $filename;
 
 	/**
 	 * @inheritdoc
@@ -89,7 +93,7 @@ class StudentWorks extends ActiveRecord {
 		return [
 			[['discipline_id', 'title'], 'required'],
 			[['type', 'discipline_id', 'student_id', 'status'], 'integer'],
-			[['status'], 'default', 'value'=> self::STATUS_NEW, 'when' => function ($model) {
+			[['status'], 'default', 'value' => self::STATUS_NEW, 'when' => function ($model) {
 					/** @var $model self */
 					return $model->isNewRecord || Yii::$app->user->identity->role_id == User::ROLE_STUDENT;
 				}],
@@ -223,18 +227,34 @@ class StudentWorks extends ActiveRecord {
 		return $this->hasMany(File::className(), ['work_id' => 'work_id']);
 	}
 
-	public function addFile(UploadedFile $file) {
-		$model       = new File;
-		$model->processFile($file);
-		$this->link('files', $model);
-		$r = $model->save();
-		Yii::$app->session->addFlash($model->path, $r);
+	public function getAllFilesSize() {
+		$summarySize = 0;
+		foreach ($this->files as $file) {
+			$summarySize += $file->size;
+		}
 
-		return $r;
+		return $summarySize;
+	}
+
+	public function addFile(UploadedFile $file) {
+		$freeMemory = 1024 * 1024 * 1024 - $this->getAllFilesSize();
+		if ($freeMemory > $file->size) {
+			$this->addError('filename', 'Слишком большой файл');
+
+			return FALSE;
+		} else {
+			$model = new File;
+			$model->processFile($file);
+			$this->link('files', $model);
+			$r = $model->save();
+			Yii::$app->session->addFlash($model->path, $r);
+
+			return $r;
+		}
 	}
 
 	public function beforeDelete() {
-		foreach($this->files as $file) {
+		foreach ($this->files as $file) {
 			$file->delete();
 		}
 

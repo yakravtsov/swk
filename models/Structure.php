@@ -43,12 +43,12 @@ class Structure extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'created' => 'Created',
-            'updated' => 'Updated',
-            'author_id' => 'Author ID',
-            'structure_id' => 'Structure ID',
-            'name' => 'Name',
-            'type' => 'Type',
+            'created' => 'Дата создания',
+            'updated' => 'Дата редактирования',
+            'author_id' => 'ID автора',
+            'structure_id' => 'ID структуры',
+            'name' => 'Название',
+            'type' => 'Тип',
         ];
     }
 }

@@ -6,8 +6,8 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\Structure */
 
-$this->title = 'Create Structure';
-$this->params['breadcrumbs'][] = ['label' => 'Structures', 'url' => ['index']];
+$this->title = 'Добавить институт';
+$this->params['breadcrumbs'][] = ['label' => 'Институты', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="structure-create">

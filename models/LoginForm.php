@@ -59,6 +59,9 @@ class LoginForm extends Model
     {
         if ($this->_user === false) {
             $this->_user = User::findByEmail($this->email);
+			if(!$this->_user) {
+				$this->_user = User::findByRecordBookId($this->email);
+			}
         }
 
         return $this->_user;

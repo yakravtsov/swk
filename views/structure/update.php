@@ -5,10 +5,10 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\Structure */
 
-$this->title = 'Update Structure: ' . ' ' . $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Structures', 'url' => ['index']];
+$this->title = 'Редактирование: ' . ' ' . $model->name;
+$this->params['breadcrumbs'][] = ['label' => 'Институты', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->structure_id]];
-$this->params['breadcrumbs'][] = 'Update';
+$this->params['breadcrumbs'][] = 'Редактирование';
 ?>
 <div class="structure-update">
 

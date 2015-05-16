@@ -71,15 +71,17 @@ $access_url = Url::to(array_merge([Yii::$app->request->getPathInfo()], Yii::$app
 				},
 				'format'    => 'html'
 			],
-			/*[
+			[
 				'attribute' => 'author',
 				'label'     => 'Автор',
 				'value'     => function ($data) {
 					return $data['author']['phio'];
 				},
 				'format'    => 'raw',
-				//'visible'	=> !Yii::$app->user->identity->role_id == User::ROLE_STUDENT
-			],*/
+				'visible'=> !Yii::$app->user->isGuest && Yii::$app->user->identity->role_id!==\app\models\User::ROLE_STUDENT
+			],
+
+
 			//'work_id',
 			//'filename',
 			// 'type',

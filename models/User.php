@@ -74,6 +74,10 @@ class User extends ActiveRecord implements IdentityInterface
 		return static::findOne(['email' => $email, 'status' => self::STATUS_ACTIVE]);
 	}
 
+	public static function findByRecordBookId($id) {
+		return static::findOne(['number'=> $id, 'status' => self::STATUS_ACTIVE]);
+	}
+
 	/**
 	 * Finds an identity by the given token.
 	 *

@@ -8,6 +8,11 @@ use app\models\search\Structure as StructureSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\User;
+
+use app\models\User as UserModel;
+use app\models\UserSearch;
+use yii\helpers\ArrayHelper;
 
 /**
  * StructureController implements the CRUD actions for Structure model.
@@ -24,6 +29,23 @@ class StructureController extends Controller
                 ],
             ],
         ];
+    }
+
+    public function beforeAction($action)
+    {
+        if (!parent::beforeAction($action)) {
+            return false;
+        }
+
+        $role_id = Yii::$app->user->isGuest ? UserModel::ROLE_GUEST : Yii::$app->user->identity->role_id;
+
+        if($role_id == UserModel::ROLE_ADMINISTRATOR || $role_id == UserModel::ROLE_TEACHER){
+            return true;
+        } else {
+            return $this->redirect('/');
+        }
+
+        return true; // or false to not run the action
     }
 
     /**
@@ -48,8 +70,26 @@ class StructureController extends Controller
      */
     public function actionView($id)
     {
+
+        $searchModel = new UserSearch();
+
+
+        /*$dataProvider = new ActiveDataProvider([
+            'query' => User::find()
+        ]);*/
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $authors = ArrayHelper::map(UserModel::find()->all(), 'id', 'phio');
+        $mo = new UserModel;
+        $statuses = $mo->getStatusValues();
+        $roles = $mo->getRoleValues();
+
         return $this->render('view', [
             'model' => $this->findModel($id),
+            'dataProvider' => $dataProvider,
+            'searchModel' => $searchModel,
+            'authors' => $authors,
+            'statuses' => $statuses,
+            'roles' => $roles
         ]);
     }
 

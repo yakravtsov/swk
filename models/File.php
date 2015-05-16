@@ -80,7 +80,7 @@ class File extends \yii\db\ActiveRecord
 	}
 
 	public function afterDelete() {
-		@unlink( $this->path);
+		@unlink($this->path);
 
 		parent::afterDelete();
 	}

@@ -49,13 +49,15 @@ class StudentWorksSearch extends StudentWorks
             $query = $customQuery;
         }
 
-        $query->joinWith(['author'=> function ($query) use ($params) {
-            /** @var $query  ActiveQuery*/
-//                    if($params['author']){
-//                        die(var_dump($params));
-//                        $query->where
-//                    }
-                 }]);
+//        $query->joinWith(['author'=> function ($query) use ($params) {
+//            /** @var $query  ActiveQuery */
+//            if (is_array($params)) {
+//                $query->andWhere(['user.phio' => $params['StudentWorksSearch']['author']]);
+//                //die(var_dump($query));
+//            }
+//        }]);
+
+            //die(var_dump($params['StudentWorksSearch']['author']));
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

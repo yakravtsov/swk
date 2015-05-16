@@ -34,8 +34,6 @@ class WorksController extends Controller
 		];
 	}
 
-	private $filename;
-
 	/**
 	 * Lists all StudentWorks models.
 	 * @return mixed
@@ -119,7 +117,6 @@ class WorksController extends Controller
 	public function actionView($id) {
 
 		$model = $this->findModel($id);
-
 		$initialPreview = [];
 		$initialPreviewConfig = [];
 
