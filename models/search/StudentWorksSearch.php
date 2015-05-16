@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\StudentWorks;
+use yii\db\ActiveQuery;
 
 /**
  * StudentWorksSearch represents the model behind the search form about `app\models\StudentWorks`.
@@ -48,7 +49,13 @@ class StudentWorksSearch extends StudentWorks
             $query = $customQuery;
         }
 
-        /*$query->joinWith(['author']);*/
+        $query->joinWith(['author'=> function ($query) use ($params) {
+            /** @var $query  ActiveQuery*/
+//                    if($params['author']){
+//                        die(var_dump($params));
+//                        $query->where
+//                    }
+                 }]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
