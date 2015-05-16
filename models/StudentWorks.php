@@ -1,0 +1,266 @@
+<?php
+
+namespace app\models;
+
+use app\components\AuthorBehavior;
+use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
+use yii\db\Expression;
+use yii\helpers\Json;
+use yii\web\UploadedFile;
+
+/**
+ * This is the model class for table "student_works".
+ *
+ * @property string  $created
+ * @property string  $updated
+ * @property integer $author_id
+ * @property integer $work_id
+ * @property string  $filename
+ * @property string  $title
+ * @property integer $type
+ * @property integer $mark
+ * @property string  $comment
+ * @property integer $discipline_id
+ * @property integer $student_id
+ * @property integer $status
+ * @property User 	 $author
+ *
+ * @property User    $student
+ */
+class StudentWorks extends ActiveRecord
+{
+
+	const TYPE_REFERAT        = 1;
+	const TYPE_COURSEWORK     = 2;
+	const TYPE_DRAFT          = 4;
+	const TYPE_LABORATORY     = 8;
+	const TYPE_REPORT         = 8;
+	const TYPE_CANDIDATE_WORK = 16;
+	const TYPE_HOME_WORK      = 32;
+	const TYPE_DOCTOR_WORK    = 64;
+	const TYPE_PRESENTATION   = 128;
+	const TYPE_GROUP_WORK     = 256;
+	const TYPE_EXAMINATION    = 512;
+	const TYPE_OFFSET         = 1024;
+	const TYPE_TEST           = 2048;
+	const TYPE_CONTROL_WORK   = 4096;
+	const TYPE_CHECK          = 8192;
+
+	const STATUS_NEW       = 1;
+	const STATUS_CONFIRMED = 2;
+	const STATUS_REJECTED  = 4;
+
+	const DISCIPLINE_STUDYING  = 1;
+	const DISCIPLINE_RESEARCH  = 2;
+	const DISCIPLINE_COMMUNITY = 4;
+	const DISCIPLINE_CULTURAL  = 8;
+
+	/**
+	 * @inheritdoc
+	 */
+	public function behaviors() {
+		return [
+			[
+				'class'              => TimestampBehavior::className(),
+				'createdAtAttribute' => 'created',
+				'updatedAtAttribute' => 'updated',
+				'value'              => new Expression('NOW()'),
+			],
+			[
+				'class'     => AuthorBehavior::className(),
+				'attribute' => 'author_id',
+			],
+		];
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public static function tableName() {
+		return 'student_works';
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function rules() {
+		return [
+			[[/*'filename', 'type',
+			  'mark',*/
+			  'discipline_id'/*, 'student_id'*/,'title'], 'required'],
+			[['type', 'mark', 'discipline_id', 'student_id', 'status'], 'integer'],
+			[['comment'], 'string'],
+		];
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function attributeLabels() {
+		return [
+			'created'       => 'Дата загрузки',
+			'updated'       => 'Дата изменения',
+			'author_id'     => 'Автор',
+			'work_id'       => 'Идентификатор',
+			'filename'      => 'Прикреплённые файлы',
+			'type'          => 'Тип работы',
+			'mark'          => 'Оценка',
+			'comment'       => 'Текст записи',
+			'discipline_id' => 'Вид деятельности',
+			'student_id'    => 'Выполнил',
+			'teacher_id'    => 'Проверил',
+			'status'        => 'Статус',
+			'title'        => 'Название',
+		];
+	}
+
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getStudent() {
+		return $this->hasOne(User::className(), ['user_id' => 'student_id']);
+	}
+
+	public function getWorkTypes() {
+		return [
+			self::TYPE_REFERAT        => 'Реферат',
+			self::TYPE_COURSEWORK     => 'Курсовая',
+			self::TYPE_DRAFT          => 'Чертеж',
+			self::TYPE_LABORATORY     => 'Лабораторная',
+			self::TYPE_REPORT         => 'Доклад',
+			self::TYPE_CANDIDATE_WORK => 'Кандидатская',
+			self::TYPE_HOME_WORK      => 'Домашняя',
+			self::TYPE_DOCTOR_WORK    => 'Докторская',
+			self::TYPE_PRESENTATION   => 'Презентация',
+			self::TYPE_GROUP_WORK     => 'Групповая',
+			self::TYPE_EXAMINATION    => 'Экзамен',
+			self::TYPE_OFFSET         => 'Зачёт',
+			self::TYPE_TEST           => 'Тест',
+			self::TYPE_CONTROL_WORK   => 'Контрольная',
+			self::TYPE_CHECK          => 'Проверочная',
+		];
+	}
+
+	public function afterFind() {
+		$this->filename = unserialize($this->filename);
+
+		return parent::afterFind();
+	}
+
+	public function beforeSave($insert = true) {
+		$this->filename = serialize($this->filename);
+
+		return parent::beforeSave($insert);
+	}
+
+	public function getFilePath(UploadedFile $file) {
+		$md5_file            = md5_file($file->tempName);
+		$md5 = md5(Yii::$app->user->identity->email . Yii::$app->user->identity->created);
+		$route          = substr($md5, 0, 3) . '/' . substr($md5, 3, 3) . '/';
+		$dir            = Yii::$app->getBasePath() . '/data/' . $route;
+		if (!is_dir($dir)) {
+			mkdir($dir, 0777, TRUE);
+			if (is_dir($dir)) {
+				Yii::info("image service create directory $dir");
+			} else {
+				Yii::warning("image service create directory fail $dir");
+			}
+		}
+		$filePath = $dir . substr($md5_file, 6) . '.' . $file->getExtension();
+		$this->_addFile($filePath);
+		//echo $filePath;
+
+		//die($filePath);
+
+		return $filePath;
+	}
+
+	private function _addFile($file) {
+		$files = $this->filename;
+		array_push($files, $file);
+		$this->filename = $files;
+	}
+
+	public function getStatusLabel() {
+		$keys = $this->getStatusValues();
+
+		return array_key_exists($this->status, $keys) ? $keys[$this->status] : 'Неизвестный статус';
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getStatusValues() {
+		$keys = [
+			self::STATUS_NEW       => 'Новая запись',
+			self::STATUS_CONFIRMED => 'Подтверждено',
+			self::STATUS_REJECTED  => 'Отклонено',
+		];
+
+		return $keys;
+	}
+
+	public function getStatusClass(){
+		$statusClasses = [
+			self::STATUS_NEW       => 'info',
+			self::STATUS_CONFIRMED => 'success',
+			self::STATUS_REJECTED  => 'danger',
+		];
+		return array_key_exists($this->status, $statusClasses) ? $statusClasses[$this->status] : 'default';
+	}
+
+	public function getDisciplineLabel() {
+		$keys = $this->getDisciplineValues();
+
+		return array_key_exists($this->discipline_id, $keys) ? $keys[$this->discipline_id] : 'Неизвестный тип';
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getDisciplineValues() {
+		$keys = [
+			self::DISCIPLINE_STUDYING  => 'Учебная',
+			self::DISCIPLINE_RESEARCH  => 'Научно-исследовательская',
+			self::DISCIPLINE_COMMUNITY => 'Общественная',
+			self::DISCIPLINE_CULTURAL  => 'Культурно-творческая',
+		];
+
+		return $keys;
+	}
+
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getAuthor() {
+		return $this->hasOne(User::className(), ['user_id' => 'author_id']);
+	}
+
+	public function getAuthorName() {
+		return $this->author['phio'];
+	}
+
+	public function getAllauthors() {
+		return $this->hasMany(User::className(), ['author_id' => 'author_id'])/*
+		            ->viaTable('project_company', ['project_id' => 'project_id'])*/
+			;
+	}
+
+	public function setAuthor() {
+		return $this->author_id;
+	}
+
+	public function deleteFile($param) {
+		@unlink($this->filename[$param-1]);
+		$other = [];
+		foreach ($this->filename as $key=>$file) {
+			if($key<>$param-1) {
+				$other[] = $file;
+			}
+		}
+
+		$this->filename = $other;
+	}
+}
