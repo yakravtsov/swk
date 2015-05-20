@@ -13,6 +13,8 @@ $role_id = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identi
 
 $this->title = 'Пользователи';
 $this->params['breadcrumbs'][] = $this->title;
+
+
 ?>
 <div class="user-index">
 
@@ -20,11 +22,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<? if ($role_id == User::ROLE_ADMINISTRATOR) { ?>
 		<p>
-			<?= Html::a(Html::tag('i', '', ['class' => 'glyphicon glyphicon-plus']) . ' Добавить пользователя', ['create'], ['class' => 'btn btn-success']) ?>
+			<?= Html::a(Html::tag('i', '', ['class' => 'glyphicon glyphicon-plus']) . ' Добавить', ['create'], ['class' => 'btn btn-success']) ?>
+			<?= Html::a(Html::tag('i', '', ['class' => 'glyphicon glyphicon-import']) . ' Импортировать', ['import'], ['class' => 'btn btn-info']) ?>
 		</p>
 	<? } ?>
-
-
 
 	<?=
 	GridView::widget([
@@ -39,12 +40,17 @@ $this->params['breadcrumbs'][] = $this->title;
 								 },
 							 'format'    => 'raw',
 						 ],
+						 'number',
 						 [
 							 'attribute' => 'email',
 							 'value'     => function ($data) {
 									 return $data->email;
 								 },
 							 'format'    => 'text',
+						 ],
+						 [
+							 'attribute' => 'structure',
+							 'value' => 'structure.name',
 						 ],
 						 /*[
 							 'attribute' => 'company_id',
@@ -70,11 +76,6 @@ $this->params['breadcrumbs'][] = $this->title;
 							 //'filter' => $roles
 
 						 ],*/
-
-						 [
-							 'attribute' => 'structure',
-							 'value' => 'structure.name'
-						 ],
 						 //'created',
 						 //'updated',
 						 /*[
@@ -86,6 +87,7 @@ $this->params['breadcrumbs'][] = $this->title;
 						 ],*/
 						 //'parent_id',
 						 // 'last_login',
+						 //'start_year',
 						 [
 							 'attribute' => 'status',
 							 'value'     => function ($data) {
@@ -96,7 +98,6 @@ $this->params['breadcrumbs'][] = $this->title;
 							 'format'    => 'html',
 							 'filter' => $statuses
 						 ],
-						 'number',
 						 // 'password_reset_token',
 						 // 'password_hash',
 						 // 'auth_key',

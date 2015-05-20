@@ -178,7 +178,6 @@ class WorksController extends Controller
 
 		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
 			$files = UploadedFile::getInstances($model, 'filename');
-
 			foreach ($files as $file) {
 				$model->addFile($file);
 			}

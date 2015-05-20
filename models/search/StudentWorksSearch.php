@@ -13,13 +13,15 @@ use yii\db\ActiveQuery;
  */
 class StudentWorksSearch extends StudentWorks
 {
+
+    public $author;
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['created', 'updated', 'filename', 'comment','title','author'], 'safe'],
+                [['created', 'updated', 'filename', 'comment','title','author'], 'safe'],
             [['author_id', 'work_id', 'type', 'mark', 'discipline_id', 'student_id', 'status'], 'integer'],
         ];
     }
@@ -41,7 +43,7 @@ class StudentWorksSearch extends StudentWorks
      * @return ActiveDataProvider
      */
     public function search($params,$customQuery = false) {
-        //die(var_dump($customQuery));
+
         if(!$customQuery){
             $query = StudentWorks::find();
         } else {
@@ -49,15 +51,7 @@ class StudentWorksSearch extends StudentWorks
             $query = $customQuery;
         }
 
-//        $query->joinWith(['author'=> function ($query) use ($params) {
-//            /** @var $query  ActiveQuery */
-//            if (is_array($params)) {
-//                $query->andWhere(['user.phio' => $params['StudentWorksSearch']['author']]);
-//                //die(var_dump($query));
-//            }
-//        }]);
-
-            //die(var_dump($params['StudentWorksSearch']['author']));
+        $query->joinWith(['author'],[]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -66,16 +60,18 @@ class StudentWorksSearch extends StudentWorks
             ]
         ]);
 
-        /*$dataProvider->sort->attributes['user'] = [
+        $dataProvider->sort->attributes['author'] = [
             // The tables are the ones our relation are configured to
             // in my case they are prefixed with "tbl_"
-            'asc' => ['structure.name' => SORT_ASC],
-            'desc' => ['structure.name' => SORT_DESC],
-        ];*/
+            'asc' => ['user.phio' => SORT_ASC],
+            'desc' => ['user.phio' => SORT_DESC],
+        ];
 
 
 
         $this->load($params);
+
+        //die(var_dump($this));
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to any records when validation fails
@@ -86,7 +82,7 @@ class StudentWorksSearch extends StudentWorks
         $query->andFilterWhere([
             'created' => $this->created,
             'updated' => $this->updated,
-            'author_id' => $this->author_id,
+            //'author_id' => $this->author_id,
             'work_id' => $this->work_id,
             'type' => $this->type,
             'mark' => $this->mark,
@@ -96,7 +92,7 @@ class StudentWorksSearch extends StudentWorks
         ]);
 
         $query->andFilterWhere(['like', 'filename', $this->filename])
-            ->andFilterWhere(['like', 'author', $this->author])
+            ->andFilterWhere(['like', 'user.phio', $this->author])
             ->andFilterWhere(['like', 'title', $this->title])
             ->andFilterWhere(['like', 'comment', $this->comment]);
 

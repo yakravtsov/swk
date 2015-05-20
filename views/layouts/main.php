@@ -63,6 +63,7 @@ $user_id = !Yii::$app->user->isGuest ? Yii::$app->user->identity->user_id : 0;
                 'encodeLabels' => false,
                 'items' => [
                     ['label' => Html::tag('i','',['class'=>'glyphicon glyphicon-user']) . ' Общая информация', 'url' => ['/users/view/?id=' . $user_id], 'visible'=> !Yii::$app->user->isGuest && Yii::$app->user->identity->role_id==\app\models\User::ROLE_STUDENT],
+                    ['label' => Html::tag('i','',['class'=>'glyphicon glyphicon-tower']) . ' Институты', 'url' => ['/structure'], 'visible'=>!Yii::$app->user->isGuest && Yii::$app->user->identity->role_id==\app\models\User::ROLE_ADMINISTRATOR],
                     ['label' => Html::tag('i','',['class'=>'glyphicon glyphicon-user']) . ' Пользователи', 'url' => ['/users'], 'visible'=>!Yii::$app->user->isGuest && Yii::$app->user->identity->role_id!=\app\models\User::ROLE_STUDENT],
                     ['label' => Html::tag('i','',['class'=>'glyphicon glyphicon-th-list']) . ' Работы', 'url' => ['/works'], 'visible'=>!Yii::$app->user->isGuest],
                     Yii::$app->user->isGuest ?

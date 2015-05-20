@@ -88,7 +88,7 @@ $access_url = Url::to(array_merge([Yii::$app->request->getPathInfo()], Yii::$app
 			// 'mark',
 			 //'comment:ntext',
 			// 'discipline_id',
-			/*[
+			[
 				'attribute' => 'discipline_id',
 				'value'     => function ($data) {
 					return $data->disciplineLabel;
@@ -96,7 +96,7 @@ $access_url = Url::to(array_merge([Yii::$app->request->getPathInfo()], Yii::$app
 				//'contentOptions' => ['style'=>'text-align: center'],
 				'format'    => 'html',
 				//'filter' => $disciplines
-			],*/
+			],
 			// 'student_id',
 			//'status',
 			[

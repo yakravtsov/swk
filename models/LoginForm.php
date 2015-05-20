@@ -10,11 +10,12 @@ use yii\base\Model;
  */
 class LoginForm extends Model
 {
+
     public $email;
     public $password;
-    public $rememberMe = true;
+    public $rememberMe = TRUE;
 
-    private $_user = false;
+    private $_user = FALSE;
 
 
     /**
@@ -33,6 +34,19 @@ class LoginForm extends Model
     }
 
     /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function scenarios()
+    {
+        return [
+            //'mail'                    => ['email', '!password'],
+            'default' => ['email', 'password'],
+            'resetPassword' => ['password'],
+            'requestPasswordResetToken' => ['email'],
+        ];
+    }
+
+    /**
      * Validates the password.
      * This method serves as the inline validation for password.
      *
@@ -43,7 +57,6 @@ class LoginForm extends Model
     {
         if (!$this->hasErrors()) {
             $user = $this->getUser();
-
             if (!$user || !$user->validatePassword($this->password)) {
                 $this->addError($attribute, 'Incorrect username or password.');
             }
@@ -57,11 +70,11 @@ class LoginForm extends Model
      */
     public function getUser()
     {
-        if ($this->_user === false) {
+        if ($this->_user === FALSE) {
             $this->_user = User::findByEmail($this->email);
-			if(!$this->_user) {
-				$this->_user = User::findByRecordBookId($this->email);
-			}
+            if (!$this->_user) {
+                $this->_user = User::findByRecordBookId($this->email);
+            }
         }
 
         return $this->_user;
@@ -76,12 +89,28 @@ class LoginForm extends Model
         if ($this->validate()) {
             return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0);
         } else {
-            return false;
+            return FALSE;
         }
     }
 
-    public function loginViaHash($email){
+    public function loginViaHash($email)
+    {
         $this->email = $email;
+
         return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0);
     }
+
+	public function recovery() {
+		if ($user = $this->getUser()) {
+
+			if(! empty($user->email)) {
+				$user->generatePasswordResetToken();
+				$user->save();
+
+				return $user;
+			}
+		}
+
+		return false;
+	}
 }

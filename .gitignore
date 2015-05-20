@@ -11,9 +11,11 @@ nbproject
 
 # windows thumbnail cache
 Thumbs.db
-
 # composer vendor dir
 /vendor
+composer.lock
+
+
 
 # composer itself is not needed
 composer.phar
@@ -26,6 +28,7 @@ phpunit.phar
 # local phpunit config
 /phpunit.xml
 
+/import
 /assets
 /data
 /log

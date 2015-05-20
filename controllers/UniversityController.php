@@ -35,9 +35,17 @@ class UniversityController extends Controller
         $searchModel = new UniversitySearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+        $university = new University();
+
+        $statuses = $university->getStatusValues();
+
+        $tarifs = $university->getTarifValues();
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'statuses' => $statuses,
+            'tarifs' => $tarifs
         ]);
     }
 
@@ -118,4 +126,5 @@ class UniversityController extends Controller
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
+
 }

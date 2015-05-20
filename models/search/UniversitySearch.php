@@ -12,6 +12,7 @@ use app\models\University;
  */
 class UniversitySearch extends University
 {
+
     /**
      * @inheritdoc
      */
@@ -19,7 +20,7 @@ class UniversitySearch extends University
     {
         return [
             [['created', 'updated', 'name', 'db_host', 'db_user', 'db_pass', 'db_name', 'paid_till', 'subdomain'], 'safe'],
-            [['author_id', 'university_id', 'db_port', 'tarif', 'status'], 'integer'],
+            [['author_id', 'university_id', 'db_port', 'tarif', 'status', 'type'], 'integer'],
         ];
     }
 
@@ -41,6 +42,9 @@ class UniversitySearch extends University
      */
     public function search($params)
     {
+
+        //die(var_dump($params));
+        //die(var_dump($this->paid_till));
         $query = University::find();
 
         $dataProvider = new ActiveDataProvider([
@@ -61,12 +65,14 @@ class UniversitySearch extends University
             'author_id' => $this->author_id,
             'university_id' => $this->university_id,
             'db_port' => $this->db_port,
-            'paid_till' => $this->paid_till,
+            //'paid_till' => $this->paid_till,
             'tarif' => $this->tarif,
             'status' => $this->status,
+            'type' => $this->type,
         ]);
 
         $query->andFilterWhere(['like', 'name', $this->name])
+            ->andFilterWhere(['<=', 'paid_till', $this->paid_till])
             ->andFilterWhere(['like', 'db_host', $this->db_host])
             ->andFilterWhere(['like', 'db_user', $this->db_user])
             ->andFilterWhere(['like', 'db_pass', $this->db_pass])

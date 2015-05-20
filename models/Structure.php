@@ -2,7 +2,10 @@
 
 namespace app\models;
 
+use app\components\AuthorBehavior;
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "structure".
@@ -13,6 +16,9 @@ use Yii;
  * @property integer $structure_id
  * @property string $name
  * @property integer $type
+ * @property integer $university_id
+ *
+ * @property University $university
  */
 class Structure extends \yii\db\ActiveRecord
 {
@@ -24,15 +30,33 @@ class Structure extends \yii\db\ActiveRecord
         return 'structure';
     }
 
+	/**
+	 * @inheritdoc
+	 */
+	public function behaviors() {
+		return [
+			[
+				'class'              => TimestampBehavior::className(),
+				'createdAtAttribute' => 'created',
+				'updatedAtAttribute' => 'updated',
+				'value'              => new Expression('NOW()'),
+			],
+			[
+				'class'     => AuthorBehavior::className(),
+				'attribute' => 'author_id',
+			]
+		];
+	}
+
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['created', 'updated'], 'safe'],
-            [['author_id', 'name', 'type'], 'required'],
-            [['author_id', 'type'], 'integer'],
+//            [['type','university_id'], 'safe'],
+            [['name'], 'required'],
+            [['university_id'], 'integer'],
             [['name'], 'string', 'max' => 255]
         ];
     }
@@ -49,6 +73,15 @@ class Structure extends \yii\db\ActiveRecord
             'structure_id' => 'ID структуры',
             'name' => 'Название',
             'type' => 'Тип',
+			'university_id' => 'University ID',
         ];
     }
+
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getUniversity()
+	{
+		return $this->hasOne(University::className(), ['university_id' => 'university_id']);
+	}
 }

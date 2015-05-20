@@ -5,10 +5,12 @@ namespace app\models;
 use app\components\AuthorBehavior;
 use Yii;
 use yii\base\NotSupportedException;
+use yii\base\Security;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
+use yii\helpers\StringHelper;
 use yii\helpers\VarDumper;
 use yii\web\IdentityInterface;
 
@@ -43,6 +45,8 @@ class User extends ActiveRecord implements IdentityInterface
 	const STATUS_INACTIVE = 0;
 	const STATUS_ACTIVE   = 1;
 
+	protected $_password;
+
 	/**
 	 * @inheritdoc
 	 */
@@ -75,7 +79,7 @@ class User extends ActiveRecord implements IdentityInterface
 	}
 
 	public static function findByRecordBookId($id) {
-		return static::findOne(['number'=> $id, 'status' => self::STATUS_ACTIVE]);
+		return static::findOne(['number' => $id, 'status' => self::STATUS_ACTIVE]);
 	}
 
 	/**
@@ -140,6 +144,7 @@ class User extends ActiveRecord implements IdentityInterface
 	public function rules() {
 		return [
 			//['user_id', 'default', 'value' => NULL, 'on' => 'signup'],
+			['password', 'safe', 'on' => 'import'],
 			[['email'], 'required', 'on' => 'signup'],
 			[['parent_id'], 'integer', 'on' => 'signup'],
 			[['email', 'phio'], 'string', 'max' => 255, 'on' => 'signup'],
@@ -150,6 +155,13 @@ class User extends ActiveRecord implements IdentityInterface
 			['status', 'default', 'value' => self::STATUS_ACTIVE],
 			['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE]],
 			['role_id', 'default', 'value' => self::ROLE_TEACHER, 'on' => 'signup'],
+			['role_id', 'default', 'value' => self::ROLE_STUDENT, 'on' => 'import'],
+			//			['password', 'default', 'value' => $this->generatePassword(), 'on' => 'import'],
+			[['number', 'university_id'], 'uniqueStudent', 'on' => 'import'],
+			/*[['university_id'], 'default', 'value'=>Yii::$app->user->identity->structure->university_id, 'when'=>function() {
+//					Yii::$app->user->identity->role_id == self::ROLE_ADMINISTRATOR
+					return false;
+				}],*/
 			['role_id', 'in', 'range' => [self::ROLE_TEACHER, self:: ROLE_STUDENT, self::ROLE_ADMINISTRATOR], 'on' => 'signup'],
 		];
 	}
@@ -159,7 +171,9 @@ class User extends ActiveRecord implements IdentityInterface
 	 */
 	public function scenarios() {
 		return [
-			'signup'                    => ['user_id', 'email', 'password', '!status', '!role', 'role_id', 'phio','number','about'],
+			'signup'                    => ['user_id', 'email', 'password', '!status', '!role', 'role_id', 'phio', 'number', 'about'],
+			'import'                    => ['user_id', 'number', 'status', 'role_id', 'phio', 'password',  'structure_id', 'university_id', 'start_year'],
+			//'update'                    => ['user_id', 'email', 'password', '!status', '!role', 'role_id', 'phio','number','about'],
 			'default'                   => [],
 			//			'resetPassword' => ['password'],
 			'requestPasswordResetToken' => ['email'],
@@ -207,23 +221,24 @@ class User extends ActiveRecord implements IdentityInterface
 	 */
 	public function attributeLabels() {
 		return [
-			'created'    => 'Создан',
-			'updated'    => 'Редактирован',
-			'author_id'  => 'Автор',
-			'user_id'    => 'ID',
-			'role_id'    => 'Роль',
-			'parent_id'  => 'Parent ID',
-			'email'      => 'Email',
-			'phio'       => 'Ф. И. О.',
-			'company_id' => 'Организация',
-			'password'   => 'Пароль',
-			'last_login' => 'Последний вход',
-			'status'     => 'Статус',
-			'login_hash' => 'Хэш входа',
+			'created'      => 'Создан',
+			'updated'      => 'Редактирован',
+			'author_id'    => 'Автор',
+			'user_id'      => 'ID',
+			'role_id'      => 'Роль',
+			'parent_id'    => 'Parent ID',
+			'email'        => 'Email',
+			'phio'         => 'Ф. И. О.',
+			'company_id'   => 'Организация',
+			'password'     => 'Пароль',
+			'last_login'   => 'Последний вход',
+			'status'       => 'Статус',
+			'login_hash'   => 'Хэш входа',
 			'structure_id' => 'ID структуры',
-			'number'     => 'Номер зачётки',
-			'structure'     => 'Институт',
-			'about'     => 'О студенте',
+			'number'       => 'Номер зачётки',
+			'structure'    => 'Институт',
+			'about'        => 'О студенте',
+			'start_year'   => 'Год поступления'
 		];
 	}
 
@@ -280,18 +295,19 @@ class User extends ActiveRecord implements IdentityInterface
 	 * @param string $password
 	 */
 	public function setPassword($password) {
+		$this->_password     = $password;
 		$this->password_hash = Yii::$app->security->generatePasswordHash($password);
 	}
 
 	public function getPassword() {
-		return;
+		return $this->scenario == 'import' ? $this->_password : 'Хуй!';
 	}
 
 	/**
 	 * Generates new password reset token
 	 */
 	public function generatePasswordResetToken() {
-		$this->password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
+		$this->password_reset_token = Yii::$app->security->generateRandomString(20) . '_' . time();
 	}
 
 	/**
@@ -314,23 +330,23 @@ class User extends ActiveRecord implements IdentityInterface
 
 	public function getAuthorName() {
 		return $this->getAuthor();
-
 	}
 
 	/**
 	 * @return ActiveQuery
 	 */
-	/*public function getStructure() {
-		return $this->hasOne(Structure::className(), ['structure_id' => 'structure_id'])->viaTable('user_structure', ['user_id' => 'user_id']);
-	}*/
-
 	public function getStructure() {
 		return $this->hasOne(Structure::className(), ['structure_id' => 'structure_id']);
 	}
 
-	public function setStructure() {
+	public function setStructure($structure_id) {
 		return TRUE;
 	}
 
+	public function uniqueStudent($attribute, $params) {
+		if (self::findOne(['number' => $this->number, 'university_id' => $this->university_id])) {
+			$this->addError('number', 'Уже существует!');
+		}
+	}
 
 }

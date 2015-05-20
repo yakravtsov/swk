@@ -47,22 +47,23 @@ class UserSearch extends User
     {
         if(!$customQuery){
             $query = User::find();
+            $query->joinWith(['structure']);
         } else {
             $query = $customQuery;
         }
 
-        /*$query->joinWith(['structure']);*/
+
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
 
-        /*$dataProvider->sort->attributes['structure'] = [
+        $dataProvider->sort->attributes['structure'] = [
             // The tables are the ones our relation are configured to
             // in my case they are prefixed with "tbl_"
             'asc' => ['structure.name' => SORT_ASC],
             'desc' => ['structure.name' => SORT_DESC],
-        ];*/
+        ];
 
         $this->load($params);
 
@@ -75,17 +76,19 @@ class UserSearch extends User
         $query->andFilterWhere([
             'created' => $this->created,
             'updated' => $this->updated,
-            'author_id' => $this->author_id,
+            //'author_id' => $this->author_id,
             'user_id' => $this->user_id,
             'role_id' => $this->role_id,
             'last_login' => $this->last_login,
             'status' => $this->status,
+            'structure_id' => $this->structure_id,
+            'start_year' => $this->start_year
         ]);
 
         $query->andFilterWhere(['like', 'email', $this->email])
             ->andFilterWhere(['like', 'phio', $this->phio])
             ->andFilterWhere(['like', 'number', $this->number])
-            ->andFilterWhere(['like', 'structure', $this->structure])
+            ->andFilterWhere(['like', 'structure.name', $this->structure])
             ->andFilterWhere(['like', 'password_reset_token', $this->password_reset_token])
             ->andFilterWhere(['like', 'password_hash', $this->password_hash]);
 

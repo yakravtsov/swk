@@ -217,7 +217,7 @@ class StudentWorks extends ActiveRecord {
 	}
 
 	public function setAuthor() {
-		return $this->author_id;
+		return true;
 	}
 
 	/**
@@ -238,7 +238,7 @@ class StudentWorks extends ActiveRecord {
 
 	public function addFile(UploadedFile $file) {
 		$freeMemory = 1024 * 1024 * 1024 - $this->getAllFilesSize();
-		if ($freeMemory > $file->size) {
+		if ($freeMemory < $file->size) {
 			$this->addError('filename', 'Слишком большой файл');
 
 			return FALSE;
