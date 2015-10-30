@@ -50,7 +50,7 @@ use kartik\select2\Select2;
 
 				<div class="btn btn-primary" style="position:relative;overflow:hidden;">
 					<i class="glyphicon glyphicon-file"></i> Выбрать файл
-					<input type="file" name="import_csv" required="required"
+					<input type="file" name="file" required="required"
 						   style="position:absolute;top:0;right:0;min-width:100%;min-height:100%;opacity:0;cursor:pointer;">
 				</div>
 			</div>
@@ -66,7 +66,7 @@ use kartik\select2\Select2;
 
 	<script type="text/javascript">
 		var fileName;
-		$('[name=import_csv]').on('change', function () {
+		$('[name=file]').on('change', function () {
 			var files = event.target.files;
 			fileName = files[0].name;
 			$('[name=import_csv_filename]').html('Вы выбрали файл «<strong>' + fileName + '</strong>»');

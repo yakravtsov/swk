@@ -1,8 +1,8 @@
 <?php
-
 namespace app\controllers;
 
 use app\models\Company;
+use app\models\Import;
 use app\models\LoginForm;
 use app\models\Structure;
 use app\models\StudentWorks;
@@ -18,6 +18,7 @@ use yii\helpers\VarDumper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 /**
  * UsersController implements the CRUD actions for User model.
@@ -31,7 +32,7 @@ class UsersController extends Controller {
 				//                'only' => ['logout', 'about'],
 				'rules' => [
 					[
-						'actions' => ['view', 'for'],
+						'actions' => ['view', 'for', 'recovery'],
 						'allow'   => TRUE,
 						'roles'   => ['?'],
 					],
@@ -59,6 +60,9 @@ class UsersController extends Controller {
 		if ($action->id == "index") {
 			switch ($role_id) {
 				case User::ROLE_ADMINISTRATOR:
+					return TRUE;
+					break;
+				case User::ROLE_GOD:
 					return TRUE;
 					break;
 				case User::ROLE_TEACHER:
@@ -106,13 +110,13 @@ class UsersController extends Controller {
 		$structures   = ArrayHelper::map(Structure::find()->all(), 'structure_id', 'name');
 
 		return $this->render('index', [
-									  'dataProvider' => $dataProvider,
-									  'searchModel'  => $searchModel,
-									  'authors'      => $authors,
-									  'statuses'     => $statuses,
-									  'roles'        => $roles,
-									  'structures'   => $structures,
-									  ]);
+			'dataProvider' => $dataProvider,
+			'searchModel'  => $searchModel,
+			'authors'      => $authors,
+			'statuses'     => $statuses,
+			'roles'        => $roles,
+			'structures'   => $structures,
+		]);
 	}
 
 	/**
@@ -131,12 +135,12 @@ class UsersController extends Controller {
 		$disciplines  = $model->getDisciplineValues();
 
 		return $this->render('view', [
-									 'model'        => $this->findModel($id),
-									 'searchModel'  => $searchModel,
-									 'dataProvider' => $dataProvider,
-									 'statuses'     => $statuses,
-									 'disciplines'  => $disciplines
-									 ]);
+			'model'        => $this->findModel($id),
+			'searchModel'  => $searchModel,
+			'dataProvider' => $dataProvider,
+			'statuses'     => $statuses,
+			'disciplines'  => $disciplines
+		]);
 	}
 
 	/**
@@ -147,6 +151,7 @@ class UsersController extends Controller {
 	public function actionCreate() {
 		$model           = new User();
 		$model->scenario = 'signup';
+		$structures      = ArrayHelper::map(Structure::find()->AsArray()->All(), 'structure_id', 'name');
 		if ($model->load(Yii::$app->request->post())) {
 			$model->generateLoginHash($model->email);
 			if ($model->save()) {
@@ -154,8 +159,9 @@ class UsersController extends Controller {
 			}
 		} else {
 			return $this->render('create', [
-										   'model' => $model
-										   ]);
+				'model'      => $model,
+				'structures' => $structures
+			]);
 		}
 	}
 
@@ -171,7 +177,8 @@ class UsersController extends Controller {
 		$role_id         = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
 		$current_user    = Yii::$app->user->identity->user_id;
 		$model           = $this->findModel($id);
-		$model->scenario = 'signup';
+		$model->scenario = 'update';
+		$structures      = ArrayHelper::map(Structure::find()->AsArray()->All(), 'structure_id', 'name');
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->id]);
 		} else {
@@ -182,18 +189,20 @@ class UsersController extends Controller {
 				case User::ROLE_STUDENT:
 					if ($current_user == $id) {
 						return $this->render('update', [
-													   'model'   => $model,
-													   'role_id' => $role_id
-													   ]);
+							'model'   => $model,
+							'role_id' => $role_id,
+						]);
 					} else {
 						return $this->redirect(['update', 'id' => $current_user]);
 					}
 					break;
 				case User::ROLE_ADMINISTRATOR:
+				case User::ROLE_GOD:
 					return $this->render('update', [
-												   'model'   => $model,
-												   'role_id' => $role_id
-												   ]);
+						'model'      => $model,
+						'role_id'    => $role_id,
+						'structures' => $structures
+					]);
 			}
 		}
 	}
@@ -230,73 +239,56 @@ class UsersController extends Controller {
 	}
 
 	public function actionStudents($id) {
-		$searchModel  = new UserSearch();
-		$structure_id = Yii::$app->user->identity->attributes['structure_id'];
-		$custom_query = User::find()->where(['structure_id' => $structure_id])
-							->andWhere(['role_id' => User::ROLE_STUDENT]);
-		$dataProvider = $searchModel->search(Yii::$app->request->queryParams, $custom_query);
-		$model        = new User();
-
+		$searchModel    = new UserSearch();
+		$structure_id   = Yii::$app->user->identity->attributes['structure_id'];
+		$custom_query   = User::find()->where(['structure_id' => $structure_id])
+		                      ->andWhere(['role_id' => User::ROLE_STUDENT]);
+		$dataProvider   = $searchModel->search(Yii::$app->request->queryParams, $custom_query);
+		$user_structure = Structure::find()->where(['structure_id' => Yii::$app->user->identity->structure_id])->one();
+		$model          = new User();
 		//$statuses = $model->getStatusValues();
 		//$disciplines = $model->getDisciplineValues();
 		return $this->render('students', [
-										 'searchModel'  => $searchModel,
-										 'dataProvider' => $dataProvider,
-										 'statuses'     => FALSE,
-										 'disciplines'  => FALSE,
-										 ]);
+			'searchModel'    => $searchModel,
+			'dataProvider'   => $dataProvider,
+			'statuses'       => FALSE,
+			'disciplines'    => FALSE,
+			'user_structure' => $user_structure
+		]);
 	}
 
 	public function actionRecovery() {
 		$form           = new LoginForm();
 		$form->scenario = 'requestPasswordResetToken';
 		if ($form->load(Yii::$app->request->post()) && $user = $form->recovery()) {
-			Yii::$app->mailer->compose('/users/mail/recovery', ['contactForm' => $form])
-							 ->setFrom(Yii::$app->params['noreplyEmail'])
-							 ->setTo($form->email)
-							 ->setSubject('Восстановление пароля')
-							 ->send();
+			$r = Yii::$app->mailer->compose('/users/mail/recovery', ['contactForm' => $form])
+			                      ->setFrom(Yii::$app->params['noreplyEmail'])
+			                      ->setTo($form->email)
+			                      ->setSubject('Восстановление пароля')
+			                      ->send();
 			Yii::$app->session->addFlash('recoverySended', 'Вам отправлено письмо. Для завершения восстановления пароля перейдите по ссылке, указанной в письме.');
 			// send mail
 			// success flash
+			die(var_dump($r));
 		} else {
 			return $this->render('recovery', [
-											 'model' => $form
-											 ]);
+				'model' => $form
+			]);
 		}
 	}
 
 	public function actionImport() {
+		$model = new Import();
 		if (Yii::$app->request->isPost) {
-			$uploads  = "../import/";
-			$filename = time() . ".csv";
-			if (move_uploaded_file($_FILES['import_csv']['tmp_name'], $uploads . $filename)) {
-				$success   = [];
-				$withError = [];
-				$users     = Yii::$app->import->processFile($uploads . $filename);
-				foreach ($users as $user) {
-					$user['university_id'] = Yii::$app->user->identity->university_id;
-					$user['structure_id']  = Yii::$app->request->post('structure_id');
-					$user['password']      = Yii::$app->security->generateRandomString(5);
-					$model                 = new User();
-					$model->scenario       = 'import';
-					if ($model->load($user, '') && $model->save()) {
-						$success[] = $user;
-					} else {
-						$withError[] = $model;
-					}
-				}
-				$passwordFile = '';
-				foreach ($success as $userModel) {
-					$passwordFile .= $userModel['phio'] . ";" . $userModel['number'] . ";" . $userModel['password'] . ";\r\n";
-					//echo $userModel['phio'];
-				}
-				$passwordFile = mb_convert_encoding($passwordFile, 'Windows-1251', 'utf8');
-				file_put_contents('../import/passwords.csv', $passwordFile);
-				Yii::$app->session->addFlash('successImported', "Успешно загружено $success пользователей");
-
-				return $this->redirect(['/users']);
+			$load = $model->load(Yii::$app->request->post(), '');
+			$model->hash = 123;//Yii::$app->security->generateRandomKey(6);
+			$model->file = UploadedFile::getInstanceByName('file');
+			$model->university_id = 1;//tmp
+			if ($load && $model->upload() && $model->save()) {
+				die('ok!');
+				//				return $this->redirect(['/users/getpasswords', 'id' => $filename]);
 			} else {
+				die(var_dump($model->errors) . '<br/>' . var_dump($model->attributes). '<br/>' . var_dump($r) . '<br/>' . var_dump(Yii::$app->request->post()) . '<br/>' . var_dump($_FILES) . '<br/>' . mb_strtolower($model->file->extension, 'utf-8'));
 				$data = Structure::find()->All();
 
 				return $this->render('import_csv', ['data' => $data, 'error' => TRUE]);
@@ -304,12 +296,24 @@ class UsersController extends Controller {
 		} else {
 			$data = ArrayHelper::map(Structure::find()->AsArray()->All(), 'structure_id', 'name');
 
-			return $this->render('import_csv', ['data' => $data,]);
+			return $this->render('import_csv', ['data' => $data, 'model' => $model]);
 		}
 	}
 
 
-	public function actionGetpasswords() {
-		Yii::$app->response->sendFile('../import/passwords.csv', 'Пароли студентов.csv');
+	public function actionGetpasswords($filename) {
+		Yii::$app->response->sendFile("../import/passwords_" . $filename, 'Пароли студентов.csv');
+	}
+
+	public function actionSwitch($id) {
+		$initialId = Yii::$app->user->getId(); //here is the current ID, so you can go back after that.
+		if ($id <> $initialId) {
+			$user     = User::findOne($id);
+			$duration = 0;
+			Yii::$app->user->switchIdentity($user, $duration); //Change the current user.
+			Yii::$app->session->set('user.idbeforeswitch', $initialId); //Save in the session the id of your admin user.
+		}
+
+		return $this->redirect(Yii::$app->user->getHomePageUrl()); //redirect to any page you like.
 	}
 }

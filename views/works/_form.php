@@ -22,7 +22,7 @@ use Zelenin\yii\widgets\Summernote\Summernote;
 		'clientOptions' => [
 			//...
 		]
-	]) ?>
+	])->label('Описание') ?>
 	<?= $form->field($model, 'filename[]')->widget(FileInput::classname(), [
 		'options'       => ['multiple' => TRUE],
 		'pluginOptions' => [

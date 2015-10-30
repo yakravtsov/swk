@@ -61,8 +61,6 @@ class WorksController extends Controller
 
 			case User::ROLE_GUEST:
 				return $this->redirect(['/login']);
-				break;
-
 			default:
 				$custom_query = FALSE;
 		}
@@ -85,10 +83,19 @@ class WorksController extends Controller
 		$searchModel = new StudentWorksSearch();
 
 		if($discipline_id){
-			$custom_query = StudentWorks::find()->where(['author_id' => $id])->andWhere(['discipline_id'=>$discipline_id]);
+			//$custom_query = StudentWorks::find()->where(['author_id' => $id])->andWhere(['discipline_id'=>$discipline_id]);
+			$custom_query = StudentWorks::find()->where(['discipline_id'=>$discipline_id])->andWhere([StudentWorks::tableName().'.author_id' => $id]);
 		} else {
-			$custom_query = StudentWorks::find()->where(['author_id' => $id]);
+			//$custom_query = StudentWorks::find()->where(['author_id' => $id]);
+			$custom_query = StudentWorks::find()->andWhere([StudentWorks::tableName().'.author_id' => $id]);
 		}
+
+		$role_id = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
+
+		if($role_id == User::ROLE_STUDENT){
+			//$custom_query;
+		}
+
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams, $custom_query);
 
 		$model       = new StudentWorks();
@@ -149,7 +156,7 @@ class WorksController extends Controller
 			foreach ($files as $file) {
 				$model->addFile($file);
 			}
-				return $this->redirect(['view', 'id' => $model->work_id]);
+				return $this->redirect(['studentworks', 'discipline_id' => $model->discipline_id, 'id' => Yii::$app->user->id]);
 			} else {
 				return $this->refresh();
 			}

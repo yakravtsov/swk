@@ -171,4 +171,13 @@ class University extends \yii\db\ActiveRecord
         parent::afterFind();
         $this->paid_till = Yii::$app->formatter->asDate($this->paid_till, 'php:d M Y');
     }
+
+	/**
+	 * @param $subdomain
+	 *
+	 * @return null|$this
+	 */
+	public static function findBySubdomain($subdomain) {
+		return self::findOne(['subdomain' => $subdomain]);
+	}
 }

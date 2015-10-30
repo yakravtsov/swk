@@ -1,4 +1,5 @@
 <?php
+use app\components\widgets\RoleSwitch;
 use app\models\User;
 use yii\bootstrap\Button;
 use yii\helpers\Html;
@@ -52,7 +53,7 @@ $user_id = !Yii::$app->user->isGuest ? Yii::$app->user->identity->user_id : 0;
     <div class="wrap">
         <?php
             NavBar::begin([
-                'brandLabel' => 'Элпост',
+                'brandLabel' => 'Studentsonline',
                 'brandUrl' => Yii::$app->homeUrl,
                 'options' => [
                     'class' => 'navbar-default navbar-inverse',
@@ -66,6 +67,7 @@ $user_id = !Yii::$app->user->isGuest ? Yii::$app->user->identity->user_id : 0;
                     ['label' => Html::tag('i','',['class'=>'glyphicon glyphicon-tower']) . ' Институты', 'url' => ['/structure'], 'visible'=>!Yii::$app->user->isGuest && Yii::$app->user->identity->role_id==\app\models\User::ROLE_ADMINISTRATOR],
                     ['label' => Html::tag('i','',['class'=>'glyphicon glyphicon-user']) . ' Пользователи', 'url' => ['/users'], 'visible'=>!Yii::$app->user->isGuest && Yii::$app->user->identity->role_id!=\app\models\User::ROLE_STUDENT],
                     ['label' => Html::tag('i','',['class'=>'glyphicon glyphicon-th-list']) . ' Работы', 'url' => ['/works'], 'visible'=>!Yii::$app->user->isGuest],
+                    RoleSwitch::getDropdown(),
                     Yii::$app->user->isGuest ?
                         ['label' => 'Войти', 'url' => ['/site/login']] :
                         ['label' => 'Выйти (' . Yii::$app->user->identity->phio . ')',
@@ -101,8 +103,8 @@ $user_id = !Yii::$app->user->isGuest ? Yii::$app->user->identity->user_id : 0;
 
     <footer class="footer">
         <div class="container">
-            <p class="pull-left"><strong>&copy; Онлайн Консалтинг, <?= date('Y') ?></strong></p>
-            <p class="pull-right"><?= Yii::powered() ?></p>
+            <p class="pull-left"><strong>&copy; <a href="//onlineconsulting.pro" target="_blank" title="Откроется в новом окне">Онлайн Консалтинг</a>, <?= date('Y') ?></strong></p>
+            <!--<p class="pull-right"><?/*= Yii::powered() */?></p>-->
         </div>
     </footer>
 

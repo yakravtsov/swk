@@ -30,8 +30,12 @@ class User extends \yii\web\User {
 			case (UserModel::ROLE_ADMINISTRATOR):
 			case (UserModel::ROLE_TEACHER):
 				return Url::to(['/works']);
+			default:
+				return Url::to('/');
 		}
+	}
 
-		return;
+	public function isGod() {
+		return $this->identity->role_id == UserModel::ROLE_GOD;
 	}
 }

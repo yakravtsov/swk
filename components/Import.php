@@ -29,34 +29,21 @@ class Import extends Component {
 				if ($this->_currentRow < $this->startRow) {
 					continue;
 				}
-				$newUser = [];
-				foreach ($this->columnsMap as $key => $column) {
-					$value = '';
-					try {
-						if (is_array($column)) {
-							foreach ($column as $c) {
-								$value .= mb_convert_encoding($data[$c], 'utf8', mb_detect_encoding($data[$c]));
-							}
-						} else {
-							$value = mb_convert_encoding($data[$column], 'utf8', mb_detect_encoding($data[$column], ['UTF-8', 'Windows-1251']));
-						}
-					} catch (\Exception $e) {
-						continue;
-					}
-					if (empty($value)) {
-						continue;
-					}
-					$newUser[$key] = $value;
-				}
+				$newUser = $this->processLine($data);
 				if (empty($newUser)) {
 					continue;
 				}
 				$this->_users[] = $newUser;
 			}
 			fclose($handle);
-
-			return $this->_users;
 		}
+
+		return $this->_users;
+	}
+
+	public function queueFile($file) {
+		$import = new \app\models\Import();
+
 	}
 
 	public function keepUser($user) {
@@ -65,5 +52,32 @@ class Import extends Component {
 
 	public function getKeeper() {
 		return $this->_keeper;
+	}
+
+	/**
+	 * @param $data
+	 *
+	 * @return mixed
+	 */
+	private function processLine($data) {
+		$user = [];
+		foreach ($this->columnsMap as $key => $column) {
+			$value = '';
+			try {
+				if (is_array($column)) {
+					foreach ($column as $c) {
+						$value .= mb_convert_encoding($data[$c], 'utf8', mb_detect_encoding($data[$c]));
+					}
+				} else {
+					$value = mb_convert_encoding($data[$column], 'utf8', mb_detect_encoding($data[$column], ['UTF-8', 'Windows-1251']));
+				}
+				$user[$key] = $value;
+			} catch (\Exception $e) {
+				return false;
+			}
+
+		}
+
+		return $user;
 	}
 }

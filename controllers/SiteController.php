@@ -1,7 +1,7 @@
 <?php
-
 namespace app\controllers;
 
+use app\models\User;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -9,94 +9,118 @@ use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
 
-class SiteController extends Controller
-{
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::className(),
-                'only' => ['logout', 'about'],
-                /*'denyCallback' => function ($rule, $action) {
-                    throw new \Exception('You are not allowed to access this page');
-                },*/
-                'rules' => [
-                    [
-                        'actions' => ['logout', 'about'],
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'logout' => ['post'],
-                ],
-            ],
-        ];
-    }
+class SiteController extends Controller {
 
-    public function actions()
-    {
-        return [
-            'error' => [
-                'class' => 'yii\web\ErrorAction',
-            ],
-            'captcha' => [
-                'class' => 'yii\captcha\CaptchaAction',
-                'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
-            ],
-        ];
-    }
+	public function behaviors() {
+		return [
+			'access' => [
+				'class' => AccessControl::className(),
+				'only'  => ['logout',],
+				/*'denyCallback' => function ($rule, $action) {
+					throw new \Exception('You are not allowed to access this page');
+				},*/
+				'rules' => [
+					[
+						'actions' => ['logout',],
+						'allow'   => TRUE,
+						'roles'   => ['@'],
+					],
+				],
+			],
+			'verbs'  => [
+				'class'   => VerbFilter::className(),
+				'actions' => [
+					'logout' => ['post'],
+				],
+			],
+		];
+	}
 
-    public function actionIndex()
-    {
-//        echo
-//        die( Yii::$app->security->generatePasswordHash('0000'));
+	public function actions() {
+		return [
+			'error'   => [
+				'class' => 'yii\web\ErrorAction',
+			],
+			'captcha' => [
+				'class'           => 'yii\captcha\CaptchaAction',
+				'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : NULL,
+			],
+		];
+	}
 
-        return $this->render('index');
-    }
+	public function actionIndex() {
+		//        echo
+		//        die( Yii::$app->security->generatePasswordHash('0000'));
+		$model = new LoginForm();
 
-    public function actionLogin()
-    {
-        if (!\Yii::$app->user->isGuest) {
-            return $this->redirect(Yii::$app->user->getHomePageUrl());
-        }
+		return $this->render('about', [
+			'model' => $model,
+		]);
+	}
 
-        $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
+	public function actionLogin() {
+		if (!\Yii::$app->user->isGuest) {
+			return $this->redirect(Yii::$app->user->getHomePageUrl());
+		}
+		$model = new LoginForm();
+		if ($model->load(Yii::$app->request->post()) && $model->login()) {
 			return $this->redirect(Yii::$app->user->getHomePageUrl());
 		} else {
-            return $this->render('login', [
-                'model' => $model,
-            ]);
-        }
-    }
+			return $this->render('login', [
+				'model' => $model,
+			]);
+		}
+	}
 
-    public function actionLogout()
-    {
-        Yii::$app->user->logout();
+	public function actionLogout() {
+		$originalId = Yii::$app->session->get('user.idbeforeswitch');
+		if ($originalId) {
+			$user     = User::findOne($originalId);
+			$duration = 0;
+			Yii::$app->user->switchIdentity($user, $duration);
+			Yii::$app->session->remove('user.idbeforeswitch');
 
-        return $this->goHome();
-    }
+			return $this->redirect(Yii::$app->user->getHomePageUrl());
+		} else {
+			Yii::$app->user->logout();
 
-    public function actionContact()
-    {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
-            Yii::$app->session->setFlash('contactFormSubmitted');
+			return $this->goHome();
+		}
+	}
 
-            return $this->refresh();
-        } else {
-            return $this->render('contact', [
-                'model' => $model,
-            ]);
-        }
-    }
+	public function actionContact() {
+		$model = new ContactForm();
+		if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
+			Yii::$app->session->setFlash('contactFormSubmitted');
 
-    public function actionAbout()
-    {
-        return $this->render('about');
-    }
+			return $this->refresh();
+		} else {
+			return $this->render('contact', [
+				'model' => $model,
+			]);
+		}
+	}
+
+	public function actionAbout() {
+		$model = new LoginForm();
+
+		return $this->render('about', [
+			'model' => $model,
+		]);
+	}
+
+	public function actionManual() {
+		return $this->render('manual', [
+			//'model' => $model,
+		]);
+	}
+
+	public function actionGetmanual() {
+		Yii::$app->response->sendFile(Yii::$app->basePath . '/misc/manual.pdf', 'manual.pdf');
+		/*$file_url = 'http://www.myremoteserver.com/file.exe';
+		header('Content-Type: application/octet-stream');
+		header("Content-Transfer-Encoding: Binary");
+		header("Content-disposition: attachment; filename=\"" . basename($file_url) . "\"");
+		readfile($file_url); // do the double-download-dance (dirty but worky)*/
+	}
 }

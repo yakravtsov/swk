@@ -1,20 +1,16 @@
 <?php
-
 use yii\helpers\Html;
 use yii\grid\GridView;
 use app\models\User;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\search\UserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $data app\models\User */
-
-$role_id = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
-
-$this->title = 'Пользователи';
+$role_id                       = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
+$this->title                   = 'Пользователи';
 $this->params['breadcrumbs'][] = $this->title;
-
-
 ?>
 <div class="user-index">
 
@@ -23,86 +19,96 @@ $this->params['breadcrumbs'][] = $this->title;
 	<? if ($role_id == User::ROLE_ADMINISTRATOR) { ?>
 		<p>
 			<?= Html::a(Html::tag('i', '', ['class' => 'glyphicon glyphicon-plus']) . ' Добавить', ['create'], ['class' => 'btn btn-success']) ?>
-			<?= Html::a(Html::tag('i', '', ['class' => 'glyphicon glyphicon-import']) . ' Импортировать', ['import'], ['class' => 'btn btn-info']) ?>
+			<? /*= Html::a(Html::tag('i', '', ['class' => 'glyphicon glyphicon-import']) . ' Импортировать', ['import'], ['class' => 'btn btn-info']) */ ?>
 		</p>
 	<? } ?>
 
 	<?=
 	GridView::widget([
-					 'dataProvider' => $dataProvider,
-					 'filterModel'  => $searchModel,
-					 'columns'      => [
-						 ['class' => 'yii\grid\SerialColumn'],
-						 [
-							 'attribute' => 'phio',
-							 'value'     => function ($data) {
-									 return Html::a($data->phio, ['view?id=' . $data->id]);
+		                 'dataProvider' => $dataProvider,
+		                 'filterModel'  => $searchModel,
+		                 'columns'      => [
+			                 ['class' => 'yii\grid\SerialColumn'],
+			                 [
+				                 'attribute' => 'phio',
+				                 'value'     => function ($data) {
+					                 return Html::a($data->phio, ['view?id=' . $data->id]);
+				                 },
+				                 'format'    => 'raw',
+			                 ],
+			                 'number',
+			                 [
+				                 'attribute' => 'email',
+				                 'value'     => function ($data) {
+					                 return $data->email;
+				                 },
+				                 'format'    => 'text',
+			                 ],
+			                 [
+				                 'attribute' => 'structure',
+				                 'value'     => 'structure.name',
+			                 ],
+			                 /*[
+								 'attribute' => 'company_id',
+								 'value'     => function ($data) {
+										 return $data->company->name;
+									 },
+								 'format'    => 'text',
+								 'filter'    => $searchModel->getCompanies()
+							 ],*/
+			                 [
+				                 'attribute' => 'role_id',
+				                 'value'     => function ($data) {
+					                 return $data->getRoleLabel();
+				                 },
+				                 'filter'    => $roles
+			                 ],
+							 'start_year',
+			                 /*[
+								 'attribute' => 'structure',
+								 'value'     => function ($data) {
+									 return $data->structure['name'];
 								 },
-							 'format'    => 'raw',
-						 ],
-						 'number',
-						 [
-							 'attribute' => 'email',
-							 'value'     => function ($data) {
-									 return $data->email;
-								 },
-							 'format'    => 'text',
-						 ],
-						 [
-							 'attribute' => 'structure',
-							 'value' => 'structure.name',
-						 ],
-						 /*[
-							 'attribute' => 'company_id',
-							 'value'     => function ($data) {
-									 return $data->company->name;
-								 },
-							 'format'    => 'text',
-							 'filter'    => $searchModel->getCompanies()
-						 ],*/
-						 [
-							 'attribute' => 'role_id',
-							 'value'     => function ($data) {
-									 return $data->getRoleLabel();
-								 },
-							 'filter' => $roles
+								 //'filter' => $roles
 
-						 ],
-						 /*[
-							 'attribute' => 'structure',
-							 'value'     => function ($data) {
-								 return $data->structure['name'];
-							 },
-							 //'filter' => $roles
-
-						 ],*/
-						 //'created',
-						 //'updated',
-						 /*[
-							'attribute' => 'author_id',
-							 'value'=>function($data) {
-									 return $data->getAuthor()['phio'];
-								 },
-							 'filter' => $authors
-						 ],*/
-						 //'parent_id',
-						 // 'last_login',
-						 //'start_year',
-						 [
-							 'attribute' => 'status',
-							 'value'     => function ($data) {
-									 return $data->getStatusLabel();
-								 	//return $data = 1 ? Html::tag('i', '', ['class' => 'glyphicon glyphicon-ok']) . " " . $data->getStatusLabel() : Html::tag('i', '', ['class' => 'glyphicon glyphicon-remove']) . " " . $data->getStatusLabel();
-								 },
-							 //'contentOptions' => ['style'=>'text-align: center'],
-							 'format'    => 'html',
-							 'filter' => $statuses
-						 ],
-						 // 'password_reset_token',
-						 // 'password_hash',
-						 // 'auth_key',
-						 ['class' => 'yii\grid\ActionColumn'],
-					 ],
-					 ]); ?>
+							 ],*/
+			                 //'created',
+			                 //'updated',
+			                 /*[
+								'attribute' => 'author_id',
+								 'value'=>function($data) {
+										 return $data->getAuthor()['phio'];
+									 },
+								 'filter' => $authors
+							 ],*/
+			                 //'parent_id',
+			                 // 'last_login',
+			                 //'start_year',
+			                 [
+				                 'attribute' => 'status',
+				                 'value'     => function ($data) {
+					                 return $data->getStatusLabel();
+					                 //return $data = 1 ? Html::tag('i', '', ['class' => 'glyphicon glyphicon-ok']) . " " . $data->getStatusLabel() : Html::tag('i', '', ['class' => 'glyphicon glyphicon-remove']) . " " . $data->getStatusLabel();
+				                 },
+				                 //'contentOptions' => ['style'=>'text-align: center'],
+				                 'format'    => 'html',
+				                 'filter'    => $statuses
+			                 ],
+			                 [
+				                 'class'    => 'yii\grid\ActionColumn',
+				                 'buttons'  => [
+					                 'switch' => function ($url, $model, $key) use ($role_id) {
+						                 if ($role_id == User::ROLE_GOD) {
+							                 return Html::a('<span class="glyphicon glyphicon-user"></span>', $url, [
+								                 'title'     => \Yii::t('yii', 'Switch'),
+								                 'data-pjax' => '0',
+							                 ]);
+						                 }
+					                 }
+				                 ],
+				                 'template' => '{view} {update} {delete} {switch}'
+			                 ],
+		                 ],
+	                 ]); ?>
 
 </div>

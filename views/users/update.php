@@ -23,6 +23,7 @@ $this->params['breadcrumbs'][] = 'Редактирование';
     } else {
         echo $this->render('_form', [
             'model' => $model,
+            'structures' => $structures
         ]);
     }
 ?>

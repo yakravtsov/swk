@@ -65,7 +65,7 @@ $access_url = Url::to(array_merge([Yii::$app->request->getPathInfo()], Yii::$app
 			],*/
 			[
 				'attribute' => 'comment',
-				'label'     => 'Текст работы',
+				'label'     => 'Описание',
 				'value'     => function($data){
 					return mb_substr($data['comment'],0,200,"UTF-8");
 				},
@@ -80,6 +80,13 @@ $access_url = Url::to(array_merge([Yii::$app->request->getPathInfo()], Yii::$app
 				'format'    => 'raw',
 				'visible'=> !Yii::$app->user->isGuest && Yii::$app->user->identity->role_id!==\app\models\User::ROLE_STUDENT
 			],
+
+		    /*[
+			    'attribute' => 'filename',
+		        'value' => function($data){
+			        return $data->filename;
+		        }
+		    ],*/
 
 
 			//'work_id',

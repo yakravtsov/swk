@@ -4,27 +4,49 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
-$form = ActiveForm::begin([
-    'id' => 'login-form',
-    'options' => ['class' => 'form-horizontal'],
-    'fieldConfig' => [
-        'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
-        'labelOptions' => ['class' => 'col-lg-1 control-label'],
-    ],
-]); ?>
 
-<?= $form->field($model, 'email') ?>
+?>
+<div class="row">
+    <div class="col-xs-12">
+        <h1>Восстановление забытого пароля</h1>
 
-<?/*= $form->field($model, 'password')->passwordInput()->label('Пароль') */?>
+        <p>
+            Уважаемый пользователь, чтобы восстановить пароль, вам необходимо:
+        </p>
+        <ol>
+            <li>Ввести в форму ниже email, указанный вами в системе «StudentsOnline», и нажать на кнопку «Получить
+                ссылку»
+            </li>
+            <li>Проверьте почту. На указанный email будет отправленная ссылка, при переходе по которой вы сможете задать
+                новый пароль
+            </li>
 
-<?/*= $form->field($model, 'rememberMe', [
-        'template' => "<div class=\"col-lg-offset-1 col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
-    ])->checkbox()->label('Запомнить меня на этом устройстве') */?>
-
-<div class="form-group">
-    <div class="col-lg-offset-1 col-lg-11">
-        <?= Html::submitButton('<i class="glyphicon glyphicon-log-in"></i> Войти', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+        </ol>
     </div>
 </div>
+<div class="row">
+    <?
+    $form = ActiveForm::begin([
+        'id' => 'login-form',
+        //'options' => ['class' => 'form-horizontal'],
+        'fieldConfig' => [
+            //'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
+            //'labelOptions' => ['class' => 'col-lg-2 control-label'],
+        ],
+    ]); ?>
+    <div class="col-xs-3">
+        <?= $form->field($model, 'email')->label('Введите email') ?>
 
-<?php ActiveForm::end(); ?>
+    </div>
+
+    <div class="col-xs-3">
+
+        <div class="form-group">
+            <label class="control-label">&nbsp;</label>
+            <div>
+            <?= Html::submitButton('<i class="glyphicon glyphicon-link"></i> Отправить ссылку', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+            </div>
+        </div>
+    </div>
+    <?php ActiveForm::end(); ?>
+</div>

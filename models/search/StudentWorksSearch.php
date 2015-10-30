@@ -2,11 +2,13 @@
 
 namespace app\models\search;
 
+use app\components\User;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\StudentWorks;
 use yii\db\ActiveQuery;
+use app\models\User as UserModel;
 
 /**
  * StudentWorksSearch represents the model behind the search form about `app\models\StudentWorks`.
@@ -51,7 +53,14 @@ class StudentWorksSearch extends StudentWorks
             $query = $customQuery;
         }
 
-        $query->joinWith(['author'],[]);
+        $role_id = Yii::$app->user->isGuest ? UserModel::ROLE_GUEST : Yii::$app->user->identity->role_id;
+
+        if($role_id == UserModel::ROLE_STUDENT){
+
+        } else {
+            $query->joinWith(['author'],[]);
+        }
+
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -88,12 +97,12 @@ class StudentWorksSearch extends StudentWorks
             'mark' => $this->mark,
             'discipline_id' => $this->discipline_id,
             'student_id' => $this->student_id,
-            'status' => $this->status,
+            'student_works.status' => $this->status,
         ]);
 
         $query->andFilterWhere(['like', 'filename', $this->filename])
             ->andFilterWhere(['like', 'user.phio', $this->author])
-            ->andFilterWhere(['like', 'title', $this->title])
+            ->andFilterWhere(['ILIKE', 'title', $this->title])
             ->andFilterWhere(['like', 'comment', $this->comment]);
 
         return $dataProvider;

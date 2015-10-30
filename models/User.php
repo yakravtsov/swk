@@ -1,5 +1,4 @@
 <?php
-
 namespace app\models;
 
 use app\components\AuthorBehavior;
@@ -17,33 +16,33 @@ use yii\web\IdentityInterface;
 /**
  * This is the model class for table "user".
  *
- * @property string       $created
- * @property string       $updated
- * @property integer      $author_id
- * @property integer      $user_id
- * @property integer      $role_id
- * @property integer      $parent_id
- * @property string       $email
- * @property string       $phio
- * @property integer      $company_id
- * @property string       $last_login
- * @property string       $password_hash
- * @property string       $password_reset_token
- * @property string       $auth_key
- * @property string       $status
- * @property string       $login_hash
- * @property string       $password write-only password
+ * @property string  $created
+ * @property string  $updated
+ * @property integer $author_id
+ * @property integer $user_id
+ * @property integer $role_id
+ * @property integer $parent_id
+ * @property string  $email
+ * @property string  $phio
+ * @property integer $company_id
+ * @property string  $last_login
+ * @property string  $password_hash
+ * @property string  $password_reset_token
+ * @property string  $auth_key
+ * @property string  $status
+ * @property string  $login_hash
+ * @property string  $password write-only password
  */
-class User extends ActiveRecord implements IdentityInterface
-{
+class User extends ActiveRecord implements IdentityInterface {
 
-	const ROLE_GUEST         = 0;
-	const ROLE_TEACHER       = 2;
-	const ROLE_STUDENT       = 4;
+	const ROLE_GUEST = 0;
+	const ROLE_TEACHER = 2;
+	const ROLE_STUDENT = 4;
 	const ROLE_ADMINISTRATOR = 8;
+	const ROLE_GOD = 16;
 
 	const STATUS_INACTIVE = 0;
-	const STATUS_ACTIVE   = 1;
+	const STATUS_ACTIVE = 1;
 
 	protected $_password;
 
@@ -113,11 +112,12 @@ class User extends ActiveRecord implements IdentityInterface
 			// token expired
 			return NULL;
 		}
-
-		return static::findOne([
+		$conditions = array_merge(self::getDefaultConditions(), [
 			'password_reset_token' => $token,
 			'status'               => self::STATUS_ACTIVE,
 		]);
+
+		return static::findOne($conditions);
 	}
 
 	/**
@@ -145,7 +145,7 @@ class User extends ActiveRecord implements IdentityInterface
 		return [
 			//['user_id', 'default', 'value' => NULL, 'on' => 'signup'],
 			['password', 'safe', 'on' => 'import'],
-			[['email'], 'required', 'on' => 'signup'],
+			//[['email'], 'required', 'on' => 'signup'],
 			[['parent_id'], 'integer', 'on' => 'signup'],
 			[['email', 'phio'], 'string', 'max' => 255, 'on' => 'signup'],
 			[['email'], 'email', 'on' => 'signup'],
@@ -172,18 +172,18 @@ class User extends ActiveRecord implements IdentityInterface
 	public function scenarios() {
 		return [
 			'signup'                    => ['user_id', 'email', 'password', '!status', '!role', 'role_id', 'phio', 'number', 'about'],
-			'import'                    => ['user_id', 'number', 'status', 'role_id', 'phio', 'password',  'structure_id', 'university_id', 'start_year'],
-			//'update'                    => ['user_id', 'email', 'password', '!status', '!role', 'role_id', 'phio','number','about'],
+			'import'                    => ['user_id', 'number', 'status', 'role_id', 'phio', 'password', 'structure_id', 'university_id', 'start_year'],
+			'update'                    => ['user_id', 'email', 'password', '!status', '!role', 'role_id', 'phio', 'number', 'about'],
 			'default'                   => [],
 			//			'resetPassword' => ['password'],
 			'requestPasswordResetToken' => ['email'],
 		];
 	}
 
-	public function getRoleLabel() {
+	public function getRoleLabel($role = null) {
 		$keys = $this->getRoleValues();
-
-		return array_key_exists($this->role_id, $keys) ? $keys[$this->role_id] : 'Неизвестная роль';
+		$roleId = $role ?: $this->role_id;
+		return array_key_exists($roleId, $keys) ? $keys[$roleId] : 'Неизвестная роль';
 	}
 
 	/**
@@ -194,8 +194,16 @@ class User extends ActiveRecord implements IdentityInterface
 			self::ROLE_GUEST         => 'Гость',
 			self::ROLE_TEACHER       => 'Преподаватель',
 			self::ROLE_STUDENT       => 'Студент',
-			self::ROLE_ADMINISTRATOR => "Администратор"
+			self::ROLE_ADMINISTRATOR => "Администратор",
+			self::ROLE_GOD           => "Супер администратор"
 		];
+	}
+
+	public function getOtherRoles() {
+		$all = $this->getRoleValues();
+		unset($all[Yii::$app->user->identity->role_id]);
+
+		return $all;
 	}
 
 	public function getStatusLabel() {
@@ -295,12 +303,20 @@ class User extends ActiveRecord implements IdentityInterface
 	 * @param string $password
 	 */
 	public function setPassword($password) {
-		$this->_password     = $password;
-		$this->password_hash = Yii::$app->security->generatePasswordHash($password);
+		if ($this->scenario !== 'update') {
+			$this->_password     = $password;
+			$this->password_hash = Yii::$app->security->generatePasswordHash($password);
+		} else {
+			if ($password !== '') {
+				$this->_password     = $password;
+				$this->password_hash = Yii::$app->security->generatePasswordHash($password);
+			}
+			//die(var_dump($this->password));
+		}
 	}
 
 	public function getPassword() {
-		return $this->scenario == 'import' ? $this->_password : 'Хуй!';
+		return $this->scenario == 'import' ? $this->_password : FALSE;
 	}
 
 	/**
@@ -344,9 +360,20 @@ class User extends ActiveRecord implements IdentityInterface
 	}
 
 	public function uniqueStudent($attribute, $params) {
-		if (self::findOne(['number' => $this->number, 'university_id' => $this->university_id])) {
+		if ($a = self::findOne(['number' => $this->number, 'university_id' => $this->university_id])) {
 			$this->addError('number', 'Уже существует!');
 		}
+	}
+
+	protected function getDefaultConditions() {
+		$conditions = [
+			'status' => self::STATUS_ACTIVE,
+		];
+		if (Yii::$app->user->isGuest || Yii::$app->user->identity->role_id != self::ROLE_GOD) {
+			$conditions['university_id'] == Yii::$app->university->model->structure_id;
+		}
+
+		return $conditions;
 	}
 
 }

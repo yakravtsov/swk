@@ -88,7 +88,7 @@ $access_url = Url::to(array_merge([Yii::$app->request->getPathInfo()], Yii::$app
 			],*/
 			[
 				'attribute' => 'comment',
-				'label'     => 'Текст работы',
+				'label'     => 'Описание',
 				'value'     => function($data){
 					return mb_substr($data['comment'],0,200,"UTF-8");
 				},

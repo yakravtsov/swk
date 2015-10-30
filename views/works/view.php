@@ -42,7 +42,7 @@ if ($role_id == User::ROLE_STUDENT) {
 	<p>
 		<?
 
-		if (Yii::$app->user->id == $model->author_id) {
+		if (Yii::$app->user->id == $model->author_id || $role_id == User::ROLE_ADMINISTRATOR) {
 
 			echo Html::a(Html::tag('i', '', ['class' => 'glyphicon glyphicon-pencil']) . ' Редактировать', ['update', 'id' => $model->work_id], ['class' => 'btn btn-primary'])
 				. " " .
@@ -57,8 +57,6 @@ if ($role_id == User::ROLE_STUDENT) {
 
 
 	<?
-	//var_dump($initialPreview);
-
 	$all_files = '';
 	foreach($initialPreview as $file){
 		$all_files .= $file . "<br>";
