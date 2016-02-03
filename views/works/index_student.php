@@ -21,16 +21,22 @@ $access_url = Url::to(array_merge([Yii::$app->request->getPathInfo()], Yii::$app
 <div class="student-works-index">
 
 
-	<h1><?= $user->phio; ?></h1>
-	<h5><?= $user->roleLabel; ?>, <?= $user->structure['name']; ?></h5>
+	<h1>
+		<?= Html::a($user->phio,['/users/view','id'=>$user->user_id],[''=>'']); ?>
+	</h1>
+	<h4 class="text-left"><?=$user->roleLabel . ", " . mb_strtolower($user->structure['name'], 'utf8');?></h4>
+
+	<? if ($role_id == User::ROLE_STUDENT) { ?>
+		<p>
+			<?= Html::a('<i class="glyphicon glyphicon-plus"></i> Добавить запись', ['create'], ['class' => 'btn btn-success']) ?>
+		</p>
+	<? } ?>
 	<div>&nbsp;</div>
 	<?php  //echo $this->render('_search', ['model' => $searchModel]); ?>
 
 	<nav class="navbar navbar-default">
 		<div class="container-fluid">
-			<a href="/users/view/?id=<?=$user->user_id?>" class="btn btn-link navbar-btn"><i class="glyphicon glyphicon-user"></i> Общая информация</a>
-			<div class="pull-right">
-				<p class="navbar-text"><strong>Вид деятельности:</strong></p>
+				<p class="navbar-text"><strong>Деятельность:</strong></p>
 				<ul class="nav navbar-nav">
 
 					<?
@@ -42,15 +48,8 @@ $access_url = Url::to(array_merge([Yii::$app->request->getPathInfo()], Yii::$app
 					}
 					?>
 				</ul>
-			</div>
 		</div>
 	</nav>
-
-	<? if ($role_id == User::ROLE_STUDENT) { ?>
-		<p>
-			<?= Html::a('<i class="glyphicon glyphicon-plus"></i> Добавить запись', ['create'], ['class' => 'btn btn-success']) ?>
-		</p>
-	<? } ?>
 
 
 	<?= GridView::widget([

@@ -1,10 +1,7 @@
 <?php
-
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
-use kartik\file\FileInput;
-use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\User */
@@ -26,17 +23,28 @@ use kartik\select2\Select2;
 
 	<?php $form = ActiveForm::begin(['action' => '/users/import', 'options' => ['enctype' => 'multipart/form-data']]); ?>
 
-
-	<div class="form-group">
 	<?
-	echo Select2::widget([
-		'name' => 'structure_id',
-		'data' => $data,
-		//'disabled' => true
-	]);
+	if (Yii::$app->user->isGod()) {
+		echo $form->field($model, 'university_id')->widget(\kartik\widgets\Select2::className(), [
+			'data' => $universityData,
+		    'options'=>['id'=>'uni', 'placeholder'=>'...']
+			//'disabled' => true
+		]);
+	}
 	?>
-	</div>
-	<!--<input type="hidden" name="company_id" value="<?/*=$company_id */?>"/>-->
+
+	<?= $form->field($model, 'structure_id')->widget(\kartik\widgets\DepDrop::className(), [
+		'type'          => \kartik\depdrop\DepDrop::TYPE_SELECT2,
+		'options'       => ['structure_id' => 'label'],
+		'pluginOptions' => [
+			'depends'     => ['uni'],
+			'placeholder' => 'Select...',
+			'url'         => Url::to(['/users/structures'])
+		]
+		//		'disabled' => true
+	])
+	?>
+	<!--<input type="hidden" name="company_id" value="<? /*=$company_id */ ?>"/>-->
 
 	<!--<select name="university_id">
 		<option></option>
@@ -51,7 +59,7 @@ use kartik\select2\Select2;
 				<div class="btn btn-primary" style="position:relative;overflow:hidden;">
 					<i class="glyphicon glyphicon-file"></i> Выбрать файл
 					<input type="file" name="file" required="required"
-						   style="position:absolute;top:0;right:0;min-width:100%;min-height:100%;opacity:0;cursor:pointer;">
+					       style="position:absolute;top:0;right:0;min-width:100%;min-height:100%;opacity:0;cursor:pointer;">
 				</div>
 			</div>
 
@@ -60,7 +68,7 @@ use kartik\select2\Select2;
 	</div>
 
 	<div class="form-group text-center">
-		<?= Html::submitButton(Html::tag('i', '', ['class' => 'glyphicon glyphicon-save']) . ' Импортировать сотрудников ', ['class' => 'btn btn-success', 'name'=>'import_csv_submit']) ?>
+		<?= Html::submitButton(Html::tag('i', '', ['class' => 'glyphicon glyphicon-save']) . ' Импортировать сотрудников ', ['class' => 'btn btn-success', 'name' => 'import_csv_submit']) ?>
 	</div>
 	<?php ActiveForm::end(); ?>
 
@@ -71,8 +79,8 @@ use kartik\select2\Select2;
 			fileName = files[0].name;
 			$('[name=import_csv_filename]').html('Вы выбрали файл «<strong>' + fileName + '</strong>»');
 		});
-		$('[name=import_csv_submit]').on('click',function(){
-			if (typeof fileName != 'undefined'){
+		$('[name=import_csv_submit]').on('click', function () {
+			if (typeof fileName != 'undefined') {
 				$(this).addClass('disabled').html('<i class="glyphicon glyphicon-hourglass"></i> Подождите, выполняется загрузка файла.');
 			}
 		});

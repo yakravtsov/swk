@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use Yii;
 use app\models\Structure;
+use app\models\University;
 use app\models\search\Structure as StructureSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -11,7 +12,7 @@ use yii\filters\VerbFilter;
 use yii\web\User;
 
 use app\models\User as UserModel;
-use app\models\UserSearch;
+use app\models\search\UserSearch;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -39,7 +40,7 @@ class StructureController extends Controller
 
         $role_id = Yii::$app->user->isGuest ? UserModel::ROLE_GUEST : Yii::$app->user->identity->role_id;
 
-        if($role_id == UserModel::ROLE_ADMINISTRATOR || $role_id == UserModel::ROLE_TEACHER){
+        if($role_id == UserModel::ROLE_ADMINISTRATOR || $role_id == UserModel::ROLE_TEACHER || $role_id == UserModel::ROLE_GOD){
             return true;
         } else {
             return $this->redirect('/');
@@ -54,8 +55,11 @@ class StructureController extends Controller
      */
     public function actionIndex()
     {
+        $current_role = Yii::$app->user->identity->role_id;
+        $current_university = Yii::$app->university->model->university_id;
+        $query = Structure::find()->where(['university_id'=>$current_university]);
         $searchModel = new StructureSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams,$query);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -77,7 +81,8 @@ class StructureController extends Controller
         /*$dataProvider = new ActiveDataProvider([
             'query' => User::find()
         ]);*/
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $custom_query = UserModel::find()->where(['structure_id'=>$id]);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams,$custom_query);
         $authors = ArrayHelper::map(UserModel::find()->all(), 'id', 'phio');
         $mo = new UserModel;
         $statuses = $mo->getStatusValues();
@@ -101,12 +106,27 @@ class StructureController extends Controller
     public function actionCreate()
     {
         $model = new Structure();
+        $current_university = Yii::$app->university->model->university_id;
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->structure_id]);
+        $universities = ArrayHelper::map(University::find()->AsArray()->All(), 'university_id', 'name');
+
+        if ($model->load(Yii::$app->request->post())) {
+
+            if (Yii::$app->user->identity->role_id !== User::ROLE_GOD) {
+                $model->university_id = $current_university;
+            }
+            if($model->save()){
+                return $this->redirect(['view', 'id' => $model->structure_id]);
+            } else {
+                return $this->render('create', [
+                    'model' => $model,
+                    'universities' => $universities
+                ]);
+            }
         } else {
             return $this->render('create', [
                 'model' => $model,
+                'universities' => $universities
             ]);
         }
     }
@@ -121,11 +141,27 @@ class StructureController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->structure_id]);
+        $current_university = Yii::$app->university->model->university_id;
+
+        $universities = ArrayHelper::map(University::find()->AsArray()->All(), 'university_id', 'name');
+
+        if ($model->load(Yii::$app->request->post())) {
+
+            if (Yii::$app->user->identity->role_id !== UserModel::ROLE_GOD) {
+                $model->university_id = $current_university;
+            }
+            if($model->save()){
+                return $this->redirect(['view', 'id' => $model->structure_id]);
+            } else {
+                return $this->render('update', [
+                    'model' => $model,
+                    'universities' => $universities
+                ]);
+            }
         } else {
             return $this->render('update', [
                 'model' => $model,
+                'universities' => $universities
             ]);
         }
     }

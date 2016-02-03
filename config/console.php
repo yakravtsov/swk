@@ -25,7 +25,18 @@ return [
                 ],
             ],
         ],
+        'import'           => [
+            'class'      => 'app\components\Import',
+            'startRow'   => 0,
+            'delimiter'  => ';',
+            'columnsMap' => [
+                'phio'       => 0,
+                'number'     => 1,
+                'start_year' => 2
+            ],
+        ],
         'db' => $db,
+        'mongodb'          => require(__DIR__ . '/mongodb.php'),
     ],
     'params' => $params,
 ];

@@ -24,10 +24,15 @@ class UserSearch extends User
         return User::scenarios();
     }
 
-    public function search($params)
+    public function search($params,$customQuery = false)
     {
-        $query = User::find();
-		$query->leftJoin(['author']);
+        if(!$customQuery){
+            $query = User::find();
+            $query->joinWith(['structure']);
+            $query->joinWith(['university']);
+        } else {
+            $query = $customQuery;
+        }
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

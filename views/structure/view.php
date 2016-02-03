@@ -9,7 +9,7 @@ use app\models\User;
 /* @var $model app\models\Structure */
 
 $this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Structures', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Институты', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="structure-view">
@@ -115,7 +115,7 @@ $this->params['breadcrumbs'][] = $this->title;
             // 'password_reset_token',
             // 'password_hash',
             // 'auth_key',
-            ['class' => 'yii\grid\ActionColumn'],
+            //['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
 

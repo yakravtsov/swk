@@ -16,10 +16,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	<h1><?= Html::tag('i', '', ['class' => 'glyphicon glyphicon-user']) . " " . Html::encode($this->title) ?></h1>
 
-	<? if ($role_id == User::ROLE_ADMINISTRATOR) { ?>
+	<? if ($role_id == User::ROLE_ADMINISTRATOR || $role_id == User::ROLE_GOD) { ?>
 		<p>
 			<?= Html::a(Html::tag('i', '', ['class' => 'glyphicon glyphicon-plus']) . ' Добавить', ['create'], ['class' => 'btn btn-success']) ?>
-			<? /*= Html::a(Html::tag('i', '', ['class' => 'glyphicon glyphicon-import']) . ' Импортировать', ['import'], ['class' => 'btn btn-info']) */ ?>
+			<?= Html::a(Html::tag('i', '', ['class' => 'glyphicon glyphicon-import']) . ' Импортировать', ['import'], ['class' => 'btn btn-info', 'disabled' => $role_id == User::ROLE_ADMINISTRATOR ? 'disabled' : false])  ?>
 		</p>
 	<? } ?>
 
@@ -38,13 +38,6 @@ $this->params['breadcrumbs'][] = $this->title;
 			                 ],
 			                 'number',
 			                 [
-				                 'attribute' => 'email',
-				                 'value'     => function ($data) {
-					                 return $data->email;
-				                 },
-				                 'format'    => 'text',
-			                 ],
-			                 [
 				                 'attribute' => 'structure',
 				                 'value'     => 'structure.name',
 			                 ],
@@ -56,13 +49,6 @@ $this->params['breadcrumbs'][] = $this->title;
 								 'format'    => 'text',
 								 'filter'    => $searchModel->getCompanies()
 							 ],*/
-			                 [
-				                 'attribute' => 'role_id',
-				                 'value'     => function ($data) {
-					                 return $data->getRoleLabel();
-				                 },
-				                 'filter'    => $roles
-			                 ],
 							 'start_year',
 			                 /*[
 								 'attribute' => 'structure',
@@ -84,6 +70,20 @@ $this->params['breadcrumbs'][] = $this->title;
 			                 //'parent_id',
 			                 // 'last_login',
 			                 //'start_year',
+			                 [
+				                 'attribute' => 'email',
+				                 'value'     => function ($data) {
+					                 return $data->email;
+				                 },
+				                 'format'    => 'text',
+			                 ],
+			                 [
+				                 'attribute' => 'role_id',
+				                 'value'     => function ($data) {
+					                 return $data->getRoleLabel();
+				                 },
+				                 'filter'    => $roles
+			                 ],
 			                 [
 				                 'attribute' => 'status',
 				                 'value'     => function ($data) {

@@ -10,11 +10,10 @@ use yii\bootstrap\ActiveForm;
 <div class="site-index">
 
 	<div class="university-logo text-center">
-		<img src="/i/university/spbgturp/logo.png" alt="" />
+		<img src="/i/university_logos/<?=Yii::$app->university->model->subdomain?>.png" alt="" />
 	</div>
 
-	<h4 class="text-center">Санкт-Петербургский государственный технологический университет растительных
-		полимеров</h4>
+	<h4 class="text-center"><?=Yii::$app->university->model->name?></h4>
 
 	<h1 class="text-center" style="font-size: 4em;">Электронное портфолио студента</h1>
 

@@ -161,7 +161,7 @@ class StudentWorks extends ActiveRecord {
 	 */
 	public function getStatusValues() {
 		$keys = [
-			self::STATUS_NEW       => 'Новая запись',
+			self::STATUS_NEW       => 'На рассмотрении',
 			self::STATUS_CONFIRMED => 'Подтверждено',
 			self::STATUS_REJECTED  => 'Отклонено',
 		];

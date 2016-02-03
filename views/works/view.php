@@ -17,12 +17,12 @@ $role_id = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identi
 
 $this->title = $model->title;
 if ($role_id == User::ROLE_GUEST) {
-	$this->params['breadcrumbs'][] = ['label' => 'Записи студентов'];
+	$this->params['breadcrumbs'][] = ['label' => 'Записи'];
 } else {
 	if ($role_id == User::ROLE_STUDENT) {
-		$this->params['breadcrumbs'][] = ['label' => 'Записи студентов'];
+		$this->params['breadcrumbs'][] = ['label' => 'Записи'];
 	} else {
-		$this->params['breadcrumbs'][] = ['label' => 'Записи студентов', 'url' => ['index']];
+		$this->params['breadcrumbs'][] = ['label' => 'Записи', 'url' => ['index']];
 	}
 }
 $this->params['breadcrumbs'][] = ['label' => $model->author->phio,
@@ -39,7 +39,7 @@ if ($role_id == User::ROLE_STUDENT) {
 
 	<h1><?= $model->title ?></h1>
 
-	<p>
+
 		<?
 
 		if (Yii::$app->user->id == $model->author_id || $role_id == User::ROLE_ADMINISTRATOR) {
@@ -53,7 +53,6 @@ if ($role_id == User::ROLE_STUDENT) {
 		}
 
 		?>
-	</p>
 
 
 	<?
@@ -64,10 +63,9 @@ if ($role_id == User::ROLE_STUDENT) {
 	?>
 
 
-	<div>&nbsp;</div>
 
 	<?
-	if ($role_id == User::ROLE_TEACHER) {
+	if ($role_id == User::ROLE_TEACHER || $role_id == User::ROLE_ADMINISTRATOR || $role_id == User::ROLE_GOD) {
 		$form = ActiveForm::begin(['action'      => ['setstatus?id=' . $model->work_id],
 		                           'layout'      => 'horizontal',
 		                           'fieldConfig' =>

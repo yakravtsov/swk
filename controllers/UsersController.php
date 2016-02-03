@@ -18,12 +18,14 @@ use yii\helpers\VarDumper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 use yii\web\UploadedFile;
 
 /**
  * UsersController implements the CRUD actions for User model.
  */
-class UsersController extends Controller {
+class UsersController extends Controller
+{
 
 	public function behaviors() {
 		return [
@@ -98,16 +100,26 @@ class UsersController extends Controller {
 	 * @return mixed
 	 */
 	public function actionIndex() {
+		$current_role       = Yii::$app->user->identity->role_id;
+		$current_university = Yii::$app->university->model->university_id;
+
+		/*$current_university = Yii::$app->user->identity->university_id;
+
+		echo Yii::$app->university->model->university_id;*/
+
 		$searchModel = new UserSearch();
 		/*$dataProvider = new ActiveDataProvider([
 			'query' => User::find()
 		]);*/
-		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-		$authors      = ArrayHelper::map(User::find()->all(), 'id', 'phio');
-		$mo           = new User;
-		$statuses     = $mo->getStatusValues();
-		$roles        = $mo->getRoleValues();
-		$structures   = ArrayHelper::map(Structure::find()->all(), 'structure_id', 'name');
+		$dataProvider = $searchModel->search(Yii::$app->request->queryParams, $query = User::find()
+		                                                                                   ->where(['university_id' => $current_university]));
+
+
+		$authors    = ArrayHelper::map(User::find()->all(), 'id', 'phio');
+		$mo         = new User;
+		$statuses   = $mo->getStatusValues();
+		$roles      = $mo->getRoleValues();
+		$structures = ArrayHelper::map(Structure::find()->all(), 'structure_id', 'name');
 
 		return $this->render('index', [
 			'dataProvider' => $dataProvider,
@@ -149,18 +161,38 @@ class UsersController extends Controller {
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model           = new User();
-		$model->scenario = 'signup';
-		$structures      = ArrayHelper::map(Structure::find()->AsArray()->All(), 'structure_id', 'name');
+		$current_university = Yii::$app->university->model->university_id;
+		$current_role       = Yii::$app->user->identity->role_id;
+		$model              = new User();
+		$model->scenario    = 'signup';
+		$structures         = ArrayHelper::map(Structure::find()->AsArray()->All(), 'structure_id', 'name');
+		if ($current_role == User::ROLE_GOD) {
+			$structures = ArrayHelper::map(Structure::find()->AsArray()->All(), 'structure_id', 'name');
+		} else {
+			$structures = ArrayHelper::map(Structure::find()->where(['university_id' => $current_university])->AsArray()
+			                                        ->All(), 'structure_id', 'name');
+		}
+		$universities = ArrayHelper::map(University::find()->AsArray()->All(), 'university_id', 'name');
 		if ($model->load(Yii::$app->request->post())) {
 			$model->generateLoginHash($model->email);
+
+			if (Yii::$app->user->identity->role_id !== User::ROLE_GOD) {
+				$model->university_id = $current_university;
+			}
 			if ($model->save()) {
 				return $this->redirect(['view', 'id' => $model->user_id]);
+			} else {
+				return $this->render('create', [
+					'model'        => $model,
+					'structures'   => $structures,
+					'universities' => $universities
+				]);
 			}
 		} else {
 			return $this->render('create', [
-				'model'      => $model,
-				'structures' => $structures
+				'model'        => $model,
+				'structures'   => $structures,
+				'universities' => $universities
 			]);
 		}
 	}
@@ -174,11 +206,15 @@ class UsersController extends Controller {
 	 * @return mixed
 	 */
 	public function actionUpdate($id) {
-		$role_id         = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
-		$current_user    = Yii::$app->user->identity->user_id;
-		$model           = $this->findModel($id);
-		$model->scenario = 'update';
-		$structures      = ArrayHelper::map(Structure::find()->AsArray()->All(), 'structure_id', 'name');
+		$role_id            = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
+		$current_university = Yii::$app->university->model->university_id;
+		$current_role       = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
+		$current_user       = Yii::$app->user->identity->user_id;
+		$model              = $this->findModel($id);
+		$model->scenario    = 'update';
+		$structures         = ArrayHelper::map(Structure::find()->where(['university_id' => $current_university])
+		                                                ->AsArray()->All(), 'structure_id', 'name');
+		$universities       = ArrayHelper::map(University::find()->AsArray()->All(), 'university_id', 'name');
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->id]);
 		} else {
@@ -189,8 +225,9 @@ class UsersController extends Controller {
 				case User::ROLE_STUDENT:
 					if ($current_user == $id) {
 						return $this->render('update', [
-							'model'   => $model,
-							'role_id' => $role_id,
+							'model'        => $model,
+							'role_id'      => $role_id,
+							'universities' => $universities
 						]);
 					} else {
 						return $this->redirect(['update', 'id' => $current_user]);
@@ -199,12 +236,33 @@ class UsersController extends Controller {
 				case User::ROLE_ADMINISTRATOR:
 				case User::ROLE_GOD:
 					return $this->render('update', [
-						'model'      => $model,
-						'role_id'    => $role_id,
-						'structures' => $structures
+						'model'        => $model,
+						'role_id'      => $role_id,
+						'structures'   => $structures,
+						'universities' => $universities
 					]);
 			}
 		}
+	}
+
+	public function actionSharing($id,$shared) {
+		$role_id            = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
+		$current_university = Yii::$app->university->model->university_id;
+		$current_role       = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
+		$current_user       = Yii::$app->user->identity->user_id;
+		$model              = $this->findModel($id);
+		$model->scenario    = 'sharing';
+		if($model->role_id == User::ROLE_STUDENT){
+		$model->shared = $shared;
+		$model->save();
+		}
+		return $this->redirect(['view', 'id' => $model->id]);
+		/*if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			die(var_dump($model->shared));
+			return $this->redirect(['view', 'id' => $model->id]);
+		} else {
+			return $this->redirect(['view', 'id' => $model->id]);
+		}*/
 	}
 
 	/**
@@ -238,7 +296,7 @@ class UsersController extends Controller {
 		}
 	}
 
-	public function actionStudents($id) {
+	public function actionStudents() {
 		$searchModel    = new UserSearch();
 		$structure_id   = Yii::$app->user->identity->attributes['structure_id'];
 		$custom_query   = User::find()->where(['structure_id' => $structure_id])
@@ -255,6 +313,16 @@ class UsersController extends Controller {
 			'disciplines'    => FALSE,
 			'user_structure' => $user_structure
 		]);
+	}
+
+	public function actionEmail() {
+		$r = Yii::$app->mailer->compose('/users/mail/email')
+		                      ->setFrom(Yii::$app->params['noreplyEmail'])
+		                      ->setTo('yakravtsov@gmail.com')
+		                      ->setSubject('Восстановление пароля')
+		                      ->send();
+
+		die(var_dump($r));
 	}
 
 	public function actionRecovery() {
@@ -280,23 +348,30 @@ class UsersController extends Controller {
 	public function actionImport() {
 		$model = new Import();
 		if (Yii::$app->request->isPost) {
-			$load = $model->load(Yii::$app->request->post(), '');
-			$model->hash = 123;//Yii::$app->security->generateRandomKey(6);
+			$load        = $model->load(Yii::$app->request->post());
+			$model->hash = Yii::$app->security->generateRandomString(6);
 			$model->file = UploadedFile::getInstanceByName('file');
-			$model->university_id = 1;//tmp
+			if (!Yii::$app->user->isGod()) {
+				$model->university_id = Yii::$app->user->identity->university_id;
+			}
 			if ($load && $model->upload() && $model->save()) {
 				die('ok!');
 				//				return $this->redirect(['/users/getpasswords', 'id' => $filename]);
 			} else {
-				die(var_dump($model->errors) . '<br/>' . var_dump($model->attributes). '<br/>' . var_dump($r) . '<br/>' . var_dump(Yii::$app->request->post()) . '<br/>' . var_dump($_FILES) . '<br/>' . mb_strtolower($model->file->extension, 'utf-8'));
+				die(var_dump($model->errors) . '<br/>' . var_dump($model->attributes) . '<br/>' . var_dump($r) . '<br/>' . var_dump(Yii::$app->request->post()) . '<br/>' . var_dump($_FILES) . '<br/>' . mb_strtolower($model->file->extension, 'utf-8'));
 				$data = Structure::find()->All();
 
 				return $this->render('import_csv', ['data' => $data, 'error' => TRUE]);
 			}
 		} else {
-			$data = ArrayHelper::map(Structure::find()->AsArray()->All(), 'structure_id', 'name');
+			$structureData  = ArrayHelper::map(Structure::find()->AsArray()->All(), 'structure_id', 'name');
+			$universityData = ArrayHelper::map(University::find()->AsArray()->All(), 'university_id', 'name');
 
-			return $this->render('import_csv', ['data' => $data, 'model' => $model]);
+			return $this->render('import_csv', [
+				'structureData'  => $structureData,
+				'universityData' => $universityData,
+				'model'          => $model
+			]);
 		}
 	}
 
@@ -315,5 +390,21 @@ class UsersController extends Controller {
 		}
 
 		return $this->redirect(Yii::$app->user->getHomePageUrl()); //redirect to any page you like.
+	}
+
+	public function actionStructures() {
+		if ($parents = Yii::$app->request->post('depdrop_parents')) {
+			if ($id = $parents[0]) {
+				$university                 = University::findOne($id);
+				$structures                 = $university->structures;
+				Yii::$app->response->format = Response::FORMAT_JSON;
+				$out                        = [];
+				foreach ($structures as $structure) {
+					$out[] = ['id' => $structure->structure_id, 'name' => $structure->name];
+				}
+
+				return ['output' => $out];
+			}
+		}
 	}
 }

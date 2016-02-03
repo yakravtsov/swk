@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use Yii;
+use app\models\User;
 use app\models\University;
 use app\models\search\UniversitySearch;
 use yii\web\Controller;
@@ -24,6 +25,19 @@ class UniversityController extends Controller
                 ],
             ],
         ];
+    }
+
+    public function beforeAction($action)
+    {
+        if (!parent::beforeAction($action)) {
+            return FALSE;
+        }
+        $role_id = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
+        if($role_id !== User::ROLE_GOD) {
+            return $this->redirect('/');
+        } else {
+            return TRUE; // or false to not run the action
+        }
     }
 
     /**

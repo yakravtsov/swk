@@ -49,8 +49,6 @@ class SiteController extends Controller {
 	}
 
 	public function actionIndex() {
-		//        echo
-		//        die( Yii::$app->security->generatePasswordHash('0000'));
 		$model = new LoginForm();
 
 		return $this->render('about', [
@@ -66,7 +64,7 @@ class SiteController extends Controller {
 		if ($model->load(Yii::$app->request->post()) && $model->login()) {
 			return $this->redirect(Yii::$app->user->getHomePageUrl());
 		} else {
-			return $this->render('login', [
+			return $this->render('about', [
 				'model' => $model,
 			]);
 		}

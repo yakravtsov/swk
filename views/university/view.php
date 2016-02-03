@@ -38,7 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
             //'subdomain',
             [
                 'attribute' => 'subdomain',
-                'value' => Html::a($model->subdomain,'//' . $model->subdomain . "." . $_SERVER['HTTP_HOST'],['target'=>'_blank']),
+                'value' => Html::a($model->subdomain,'//' . $model->subdomain . ".studentsonline.ru",['target'=>'_blank']),
                 'format' => 'raw'
             ],
             'paid_till',
@@ -56,8 +56,8 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]) ?>
 
-    <h4>Параметры подключения</h4>
-        <?= DetailView::widget([
+    <!--<h4>Параметры подключения</h4>
+        --><?/*= DetailView::widget([
             'model' => $model,
             'template' => "<tr><td style='width:50px;'><strong>{label}</strong></td><td>{value}</td></tr>",
             'attributes' => [
@@ -67,5 +67,5 @@ $this->params['breadcrumbs'][] = $this->title;
                 'db_pass',
                 'db_name',
             ]
-        ]); ?>
+        ]); */?>
 </div>

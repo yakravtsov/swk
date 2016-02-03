@@ -14,7 +14,7 @@ class LoginForm extends Model
     public $email;
     public $password;
     public $rememberMe = TRUE;
-
+    /** @var User */
     private $_user = FALSE;
 
 
@@ -75,6 +75,11 @@ class LoginForm extends Model
             if (!$this->_user) {
                 $this->_user = User::findByRecordBookId($this->email);
             }
+            if($this->_user && $this->_user->role_id <> User::ROLE_GOD) {
+                if(Yii::$app->university->model->university_id <> $this->_user->university_id) {
+                    $this->_user = false;
+                }
+            }
         }
 
         return $this->_user;
@@ -113,4 +118,15 @@ class LoginForm extends Model
 
 		return false;
 	}
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'email' => 'номер зачётки или email',
+            'password' => 'Пароль',
+        ];
+    }
 }

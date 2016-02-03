@@ -58,6 +58,9 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'paid_till',
                 //'value' => 'paid_till',
+                'options' => [
+                    'style' => 'width: 140px;'
+                ],
                 'filter' => DatePicker::widget([
                     'name' => 'UniversitySearch[paid_till]',
                     'attribute' => 'paid_till',

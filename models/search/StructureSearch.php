@@ -39,9 +39,13 @@ class StructureSearch extends Structure
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params,$customQuery = false)
     {
-        $query = Structure::find();
+        if(!$customQuery){
+            $query = Structure::find();
+        } else {
+            $query = $customQuery;
+        }
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

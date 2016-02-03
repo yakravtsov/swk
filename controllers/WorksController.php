@@ -41,13 +41,16 @@ class WorksController extends Controller
 
 
 	public function actionIndex() {
+		$current_role = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
+		$current_university = Yii::$app->university->model->university_id;
+
 		$role_id = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
 		$searchModel = new StudentWorksSearch();
 
 		switch ($role_id) {
 			case User::ROLE_TEACHER:
 				$structure_id   = yii::$app->user->identity->structure['structure_id'];
-				$ownStudents    = User::find()->where(['structure_id' => $structure_id])
+				$ownStudents    = User::find()->where(['structure_id' => $structure_id])->andWhere(['university_id'=>$current_university])
 				                      ->andWhere(['role_id' => User::ROLE_STUDENT])->asArray()->All();
 				$ownStudentsIds = ArrayHelper::map($ownStudents, 'user_id', 'phio');
 				$custom_query   = StudentWorks::find()->where([StudentWorks::tableName().'.author_id' => array_keys($ownStudentsIds)]);
@@ -62,19 +65,24 @@ class WorksController extends Controller
 			case User::ROLE_GUEST:
 				return $this->redirect(['/login']);
 			default:
-				$custom_query = FALSE;
+				$custom_query = StudentWorks::find();
 		}
+
+		//$custom_query->andWhere(['university_id'=>$current_university]);
 
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams, $custom_query);
 
 		$model    = new StudentWorks();
 		$statuses = $model->getStatusValues();
 
+		$disciplines = $model->getDisciplineValues();
+
 
 		return $this->render('index', [
 			'searchModel'  => $searchModel,
 			'dataProvider' => $dataProvider,
-			'statuses'     => $statuses
+			'statuses'     => $statuses,
+			'disciplines' => $disciplines
 		]);
 	}
 

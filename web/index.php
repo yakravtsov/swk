@@ -12,6 +12,5 @@ $config = require(__DIR__ . '/../config/web.php');
 class Swk extends yii\web\Application {
 
 }
-
 $app = new Swk($config);
 $app->run();

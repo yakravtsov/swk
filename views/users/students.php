@@ -8,16 +8,17 @@ use yii\grid\GridView;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $data app\models\User */
 
-$this->title = 'Пользователи';
+$this->title = 'Студенты';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="user-index">
 
-    <h1><?= Html::tag('i', '', ['class' => 'glyphicon glyphicon-user']) . " " . Html::encode($this->title) ?></h1>
+    <h1><?=Html::encode($this->title) ?></h1>
+    <h4 class="text-left"><?=$user_structure->name;?></h4>
 
-    <p>
-        <?= Html::a(Html::tag('i', '', ['class' => 'glyphicon glyphicon-plus']) . ' Добавить пользователя', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+    <!--<p>
+        <?/*= Html::a(Html::tag('i', '', ['class' => 'glyphicon glyphicon-plus']) . ' Добавить студента', ['create'], ['class' => 'btn btn-success']) */?>
+    </p>-->
 
     <?=
     GridView::widget([
@@ -32,6 +33,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
                 'format'    => 'raw',
             ],
+            'number',
+            'start_year',
             [
                 'attribute' => 'email',
                 'value'     => function ($data) {
@@ -39,43 +42,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
                 'format'    => 'text',
             ],
-            /*[
-                'attribute' => 'company_id',
-                'value'     => function ($data) {
-                        return $data->company->name;
-                    },
-                'format'    => 'text',
-                'filter'    => $searchModel->getCompanies()
-            ],*/
-            /*[
-                'attribute' => 'structure',
-                'value'     => function ($data) {
-                    return $data->structure['name'];
-                },
-                //'filter' => $roles
-
-            ],*/
-
-            /*[
-                'attribute' => 'structure',
-                'value' => 'structure.name'
-            ],*/
-            //'created',
-            //'updated',
-            /*[
-               'attribute' => 'author_id',
-                'value'=>function($data) {
-                        return $data->getAuthor()['phio'];
-                    },
-                'filter' => $authors
-            ],*/
-            //'parent_id',
-            // 'last_login',
-            'number',
             // 'password_reset_token',
             // 'password_hash',
             // 'auth_key',
-            ['class' => 'yii\grid\ActionColumn'],
+            //['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
 

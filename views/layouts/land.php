@@ -1,64 +1,139 @@
-<?php
-use yii\helpers\Html;
-use yii\bootstrap\Nav;
-use yii\bootstrap\NavBar;
-use yii\widgets\Breadcrumbs;
-use app\assets\AppAsset;
-
-/* @var $this \yii\web\View */
-/* @var $content string */
-
-AppAsset::register($this);
+﻿<?php
+$this->beginPage()
 ?>
-<?php $this->beginPage() ?>
-<!DOCTYPE html>
-<html lang="<?= Yii::$app->language ?>">
-<head>
-	<meta charset="<?= Yii::$app->charset ?>">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<?= Html::csrfMetaTags() ?>
-	<title><?= Html::encode($this->title) ?></title>
-	<?php $this->head() ?>
+	<!doctype html>
+	<html>
+	<head>
+		<title>Электронное портфолио обучающегося для ВУЗов по ФГОС 3+</title>
+		<?php $this->head() ?>
+		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+		<meta property="og:url" content="studentsonline.onlineconsulting.pro">
+		<meta property="og:title"
+		      content="Электронное портфолио обучающегося — готовое решение для ВУЗов согласно ФГОС 3+">
+		<meta property="og:description"
+		      content="Ознакомьтесь с возможностями и посмотрите демоверсию «Students Online» на сайте.">
+		<meta property="og:image" content="/landing/i/og_image.jpg">
+		<link rel="image_src" href="/i/og_image.jpg">
 
-	<?
-	$js = <<< 'SCRIPT'
-/* To initialize BS3 tooltips set this below */
-$(function () {
-    $("[data-toggle='tooltip']").tooltip();
-});;
-/* To initialize BS3 popovers set this below */
-$(function () {
-    $("[data-toggle='popover']").popover();
-});
-SCRIPT;
-	// Register tooltip/popover initialization javascript
-	$this->registerJs($js);
-	?>
-</head>
-<body>
+		<link rel="stylesheet" href="/landing/css/reset-min.css" media="all" type="text/css">
+		<link rel="stylesheet/less" href="/landing/css/main.less" type="text/css">
 
-<?php $this->beginBody() ?>
+		<link rel="stylesheet" href="/landing/css/tooltip.css" media="all" type="text/css">
+
+		<script src="/landing/js/less.min.js" type="text/javascript"></script>
+		<script src="/landing/js/jquery-1.11.0.min.js" type="text/javascript"></script>
+
+		<script src="/landing/js/jquery.easing.1.3.js" type="text/javascript"></script>
+
+		<link href="/landing/js/fancybox/jquery.fancybox.css" rel="stylesheet" media="all" type="text/css">
+		<script src="/landing/js/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.0.6/jquery.mousewheel.min.js"
+		        type="text/javascript"></script>
+		<script src="/landing/js/SmoothScroll.js" type="text/javascript" charset="utf-8"></script>
+
+		<script src="/landing/js/core.js" type="text/javascript"></script>
+
+		<link rel="shortcut icon" type="image/x-icon" href="/landing/i/favicon.png">
+
+		<script>
+			(function (i, s, o, g, r, a, m) {
+				i['GoogleAnalyticsObject'] = r;
+				i[r] = i[r] || function () {
+					(i[r].q = i[r].q || []).push(arguments)
+				}, i[r].l = 1 * new Date();
+				a = s.createElement(o),
+					m = s.getElementsByTagName(o)[0];
+				a.async = 1;
+				a.src = g;
+				m.parentNode.insertBefore(a, m)
+			})(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+			ga('create', 'UA-69522824-1', 'auto');
+			ga('send', 'pageview');
+
+		</script>
+	</head>
+	<body>
+	<div class="wrapper">
+			<?php $this->beginBody() ?>
+			<header id="home">
+				<div class="container">
+					<div class="logo left">
+						<img src="/landing/i/logo.png" alt="Онлайн Консалтинг"/>
+					</div>
+					<div class="contacts right">
+						<a class="phone" href="tel:89111647864">8 911 164-78-64</a>
+						<a class="email" href="mailto:pochta@studentsonline.ru">pochta@studentsonline.ru</a>
+					</div>
+					<div class="clear"></div>
+				</div>
+			</header>
+
+		<div class="wrapper-content">
+
+			<?= $content ?>
+
+		</div>
+			<footer>
+				<div class="container">
+					<div class="logo left">
+						<img src="/landing/i/footer/logo.png" alt="Students Online"/>
+						<img src="/landing/i/onlineconsulting.png" alt="Онлайн Консалтинг"/>
+						<img src="/landing/i/footer/made_in_Russia.png" alt="Сделано в России"/>
+					</div>
+					<div class="contacts right">
+						<a class="phone" href="tel:89111647864">8 911 164-78-64</a>
+						<a class="email" href="mailto:pochta@studentsonline.ru">pochta@studentsonline.ru</a>
+					</div>
+					<div class="clear"></div>
+					<div class="legal">© Онлайн Консалтинг, 2015. ОГРН 1137847243060. 198097, Санкт-Петербург, улица
+						Маршала
+						Говорова, 29 литер А.
+					</div>
+				</div>
+			</footer>
 
 
-<?
+	<?php $this->endBody() ?>
+	<!-- Yandex.Metrika counter -->
+	<script type="text/javascript">
+		(function (d, w, c) {
+			(w[c] = w[c] || []).push(function () {
+				try {
+					w.yaCounter33339158 = new Ya.Metrika({
+						id: 33339158,
+						clickmap: true,
+						trackLinks: true,
+						accurateTrackBounce: true,
+						webvisor: true
+					});
+				} catch (e) {
+				}
+			});
 
-$user_id = !Yii::$app->user->isGuest ? Yii::$app->user->identity->user_id : 0;
-?>
+			var n = d.getElementsByTagName("script")[0],
+				s = d.createElement("script"),
+				f = function () {
+					n.parentNode.insertBefore(s, n);
+				};
+			s.type = "text/javascript";
+			s.async = true;
+			s.src = "https://mc.yandex.ru/metrika/watch.js";
 
-<div class="wrap">
-	<div class="container">
-		<?= $content ?>
-	</div>
-</div>
-
-<footer class="footer">
-	<div class="container">
-		<p class="pull-left"><strong>&copy; <a href="//onlineconsulting.pro" target="_blank" title="��������� � ����� ����">������ ����������</a>, <?= date('Y') ?></strong></p>
-		<!--<p class="pull-right"><?/*= Yii::powered() */?></p>-->
-	</div>
-</footer>
-
-<?php $this->endBody() ?>
-</body>
-</html>
+			if (w.opera == "[object Opera]") {
+				d.addEventListener("DOMContentLoaded", f, false);
+			} else {
+				f();
+			}
+		})(document, window, "yandex_metrika_callbacks");
+	</script>
+	<noscript>
+		<div><img src="https://mc.yandex.ru/watch/33339158" style="position:absolute; left:-9999px;" alt=""/></div>
+	</noscript>
+	<!-- /Yandex.Metrika counter -->
+	<script type="text/javascript">
+		(window.Image ? (new Image()) : document.createElement('img')).src = location.protocol + '//vk.com/rtrg?r=OnIkfvwX*xE8olSxP9XTNczV90dj7492eH0iTwlAh9/ZU5/OyY460yxAAm9DZ2DfAv8lRmOLtrlzExXAN7X/a1198MwUtneQVuzqoVY4hs3JArv/vkjLcddVY53PUianTHwPV*i5Gcon9E/aqCtgnPEq*qL9ApTsUzPEH*S6hZ8-';</script>
+	</body>
+	</html>
 <?php $this->endPage() ?>

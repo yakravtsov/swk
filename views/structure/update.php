@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use app\models\User;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Structure */
@@ -16,6 +17,7 @@ $this->params['breadcrumbs'][] = 'Редактирование';
 
     <?= $this->render('_form', [
         'model' => $model,
+        'universities' => $universities
     ]) ?>
 
 </div>

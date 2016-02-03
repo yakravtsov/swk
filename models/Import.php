@@ -27,16 +27,14 @@ use yii\web\UploadedFile;
  */
 class Import extends \yii\db\ActiveRecord {
 
-	public function formName() {
-		return FALSE;
-	}
+	const STATUS_WAITING = 0;
 
 	public function behaviors() {
 		return [
 			[
 				'class'              => BlameableBehavior::className(),
 				'createdByAttribute' => 'author_id',
-				'updatedByAttribute' => false,
+				'updatedByAttribute' => FALSE,
 			],
 			[
 				'class'              => TimestampBehavior::className(),
@@ -59,11 +57,9 @@ class Import extends \yii\db\ActiveRecord {
 	 */
 	public function rules() {
 		return [
-			[[/*'university_id', */
-			  'structure_id'], 'required'],
-			[[/*'university_id', */
-			  'structure_id', 'status', 'try'], 'integer'],
-			[['file'], 'file', 'skipOnEmpty' => FALSE, 'extensions' => 'csv', 'checkExtensionByMimeType' => FALSE], //todo use mimetypes, not only extension of file
+			[['university_id', 'structure_id'], 'required'],
+			[['university_id', 'structure_id', 'status', 'try'], 'integer'],
+			[['file'], 'file', 'skipOnEmpty' => FALSE, 'extensions' => 'csv', 'checkExtensionByMimeType' => FALSE, 'only'=>'insert'], //todo use mimetypes, not only extension of file
 		];
 	}
 
@@ -114,5 +110,9 @@ class Import extends \yii\db\ActiveRecord {
 	 */
 	public static function find() {
 		return new ImportQuery(get_called_class());
+	}
+
+	public function getPath() {
+		return __DIR__.'/../uploads/'.$this->file;
 	}
 }

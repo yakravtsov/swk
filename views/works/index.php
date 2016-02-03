@@ -11,7 +11,7 @@ use yii\helpers\Url;
 
 $role_id = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
 
-$this->title                   = 'Записи студентов';
+$this->title                   = 'Записи';
 $this->params['breadcrumbs'][] = $this->title;
 if($role_id==User::ROLE_STUDENT){
 $access_url = Url::to(array_merge([Yii::$app->request->getPathInfo()], Yii::$app->request->getQueryParams(),['access_code'=>md5(Url::current().Yii::$app->user->identity->login_hash)]));
@@ -20,7 +20,7 @@ $access_url = Url::to(array_merge([Yii::$app->request->getPathInfo()], Yii::$app
 ?>
 <div class="student-works-index">
 
-	<h1><?= Html::encode($this->title) ?></h1>
+	<h1><?= Html::tag('i','',['class'=>'glyphicon glyphicon-th-list']) . " " . Html::encode($this->title) ?></h1>
 	<?php  //echo $this->render('_search', ['model' => $searchModel]); ?>
 
 	<? if ($role_id == User::ROLE_STUDENT) { ?>
@@ -67,7 +67,7 @@ $access_url = Url::to(array_merge([Yii::$app->request->getPathInfo()], Yii::$app
 				'attribute' => 'comment',
 				'label'     => 'Описание',
 				'value'     => function($data){
-					return mb_substr($data['comment'],0,200,"UTF-8");
+					return strip_tags(mb_substr($data['comment'],0,200,"UTF-8"));
 				},
 				'format'    => 'html'
 			],
@@ -102,7 +102,7 @@ $access_url = Url::to(array_merge([Yii::$app->request->getPathInfo()], Yii::$app
 				},
 				//'contentOptions' => ['style'=>'text-align: center'],
 				'format'    => 'html',
-				//'filter' => $disciplines
+				'filter' => $disciplines
 			],
 			// 'student_id',
 			//'status',
@@ -120,7 +120,8 @@ $access_url = Url::to(array_merge([Yii::$app->request->getPathInfo()], Yii::$app
 				'attribute' => 'created',
 				'value'     => function ($data) {
 					return Yii::$app->formatter->asDatetime($data['created'], "php:d M Y");
-				}
+				},
+				'filter' => false
 			],
 
 			//['class' => 'yii\grid\ActionColumn'],

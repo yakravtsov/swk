@@ -7,6 +7,7 @@
  */
 namespace app\components;
 
+use app\models\ImportUsers;
 use yii\base\Component;
 
 class Import extends Component {
@@ -23,27 +24,26 @@ class Import extends Component {
 	private $_currentRow = 0;
 
 	public function processFile($file) {
-		if (($handle = fopen($file, "r")) !== FALSE) {
+		if (($handle = fopen($file->getPath(), "r")) !== FALSE) {
 			while (($data = fgetcsv($handle, NULL, $this->delimiter)) !== FALSE) {
 				$this->_currentRow += 1;
 				if ($this->_currentRow < $this->startRow) {
 					continue;
 				}
 				$newUser = $this->processLine($data);
-				if (empty($newUser)) {
-					continue;
+				$newUser['file_id'] = $file->file_id;
+				$newUser['university_id'] = $file->university_id;
+				$newUser['structure_id'] = $file->structure_id;
+				$newUser['import_status'] = 0;
+				$newUser['try'] = 0;
+				if ($newUser) {
+					$result = $this->storeTempUser($newUser);
 				}
-				$this->_users[] = $newUser;
 			}
 			fclose($handle);
 		}
 
-		return $this->_users;
-	}
-
-	public function queueFile($file) {
-		$import = new \app\models\Import();
-
+		return $result;
 	}
 
 	public function keepUser($user) {
@@ -73,11 +73,19 @@ class Import extends Component {
 				}
 				$user[$key] = $value;
 			} catch (\Exception $e) {
-				return false;
+				return FALSE;
 			}
-
 		}
 
 		return $user;
+	}
+
+	private function storeTempUser($user) {
+		$provider = new ImportUsers();
+		if ($l = $provider->load($user, '') && $s = $provider->save()) {
+			return TRUE;
+		}
+
+		return FALSE;
 	}
 }

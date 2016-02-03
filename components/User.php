@@ -28,6 +28,7 @@ class User extends \yii\web\User {
 			case (UserModel::ROLE_STUDENT):
 				return Url::to(['users/view', 'id'=>$this->identity->user_id]);
 			case (UserModel::ROLE_ADMINISTRATOR):
+				return Url::to(['/users']);
 			case (UserModel::ROLE_TEACHER):
 				return Url::to(['/works']);
 			default:
