@@ -22,10 +22,14 @@ class RoleSwitch extends \yii\base\Widget {
 		$other   = Yii::$app->user->identity->getOtherRoles();
 		$visible = $isGod;
 		$items   = [];
+		$items[] = [
+			'label' => Yii::$app->user->getIdentity()->getRoleLabel(),
+		    'disabled'=>true
+		];
 		foreach ($other as $role=>$label) {
 			$items[] = [
 				'label' => Yii::$app->user->getIdentity()->getRoleLabel($role),
-				'url' => Url::to()
+				'url' => Url::to(['/users/role', 'roleId' => $role])
 			];
 		}
 

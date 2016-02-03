@@ -8,16 +8,15 @@ $config = [
 	'name'       => 'Электронное портфолио студента',
 	//'defaultRoute'=>'/works',
 	'components' => [
-		'university'       => [
+		'university'   => [
 			'class' => 'app\components\University',
 		],
 		// todo
-		'assetManager'     => [
+		'assetManager' => [
 			'converter' => [
 				'forceConvert' => TRUE,
 			]
 		],
-
 		/*'clientScript' => [
 
 			// disable default yii scripts
@@ -26,15 +25,17 @@ $config = [
 				'jquery.min.js' => false,
 			],
 		],*/
-		'request'          => [
+		'request'      => [
 			// !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
 			'cookieValidationKey' => 'qWAJRmarPcAvHIwgJun_QSkqwKSBeBZn',
 		],
-		'cache'            => [
+		'cache'        => [
 			'class' => 'yii\caching\FileCache',
 		],
-		'import'           => [
+		'import'       => [
 			'class'      => 'app\components\Import',
+			'hash'       => 'GVr9Z7vufM2c',
+			'outputPath' => '@app/output',
 			'startRow'   => 0,
 			'delimiter'  => ';',
 			'columnsMap' => [
@@ -43,23 +44,23 @@ $config = [
 				'start_year' => 2
 			],
 		],
-		'user'             => [
+		'user'         => [
 			'class'           => 'app\components\User',
 			'identityClass'   => 'app\models\User',
 			'enableAutoLogin' => TRUE,
 			'loginUrl'        => '/login'
 		],
-		'errorHandler'     => [
+		'errorHandler' => [
 			'errorAction' => 'site/error',
 		],
-		'mailer'           => [
+		'mailer'       => [
 			'class'            => 'yii\swiftmailer\Mailer',
 			// send all mails to a file by default. You have to set
 			// 'useFileTransport' to false and configure a transport
 			// for the mailer to send real emails.
 			'useFileTransport' => TRUE,
 		],
-		'log'              => [
+		'log'          => [
 			'traceLevel' => YII_DEBUG ? 3 : 0,
 			'targets'    => [
 				'file'  => [
@@ -77,12 +78,13 @@ $config = [
 				],
 			],
 		],
-		'urlManager'       => [
+		'urlManager'   => [
 			'enablePrettyUrl'     => TRUE,
 			'enableStrictParsing' => FALSE,
 			'showScriptName'      => FALSE,
 			'rules'               => [
 				'http://studentsonline.ru'              => 'land/index',
+				'http://studentsonline.ru/<agent:[\w-]+>' => 'land/agent',
 				'http://www.studentsonline.ru'          => 'land/index',
 				'http://studentsonline.ru/presentation' => 'land/presentation',
 				'http://studentsonline.ru/success'      => 'land/success',
@@ -90,15 +92,14 @@ $config = [
 				//				['class' => 'yii\rest\UrlRule', 'controller' => 'user'],
 				'debug/<controller>/<action>'           => 'debug/<controller>/<action>',
 				'<controller>/<action>'                 => '<controller>/<action>',
-				'login'                                 => 'site/login'
+				'login'                                 => 'site/login',
 			],
 		],
-		'session'          => [
+		'session'      => [
 			'class' => 'yii\mongodb\Session',
 		],
-		'db'               => require(__DIR__ . '/db.php'),
-		'mongodb'          => require(__DIR__ . '/mongodb.php'),
-
+		'db'           => require(__DIR__ . '/db.php'),
+		'mongodb'      => require(__DIR__ . '/mongodb.php'),
 	],
 	'params'     => $params,
 ];
@@ -118,7 +119,7 @@ if (YII_ENV_DEV) {
 	$config['bootstrap'][]                    = 'gii';
 	$config['modules']['gii']                 = [
 		'class'      => 'yii\gii\Module',
-		'allowedIPs' => ['127.0.0.1', '::1', '192.168.0.*', '176.117.143.48', '192.168.56.112', '217.71.236.162'],
+		'allowedIPs' => ['127.0.0.1', '::1', '192.168.0.*', '176.117.143.48', '192.168.56.112', '217.71.236.162', '217.71.236.160'],
 		'generators' => [
 			'mongoDbModel' => [
 				'class' => 'yii\mongodb\gii\model\Generator'

@@ -22,19 +22,21 @@
     "php": ">=5.4.0",
     "yiisoft/yii2": ">=2.0.5",
     "yiisoft/yii2-bootstrap": "*",
+    "yiisoft/yii2-mongodb": "*",
     "yiisoft/yii2-swiftmailer": "*",
     "kartik-v/yii2-widgets": "*",
     "vova07/yii2-fileapi-widget": "*",
     "yiisoft/yii2-jui": "*",
     "2amigos/yii2-date-picker-widget": "~1.0",
-    "nizsheanez/yii2-asset-converter": "1.*"
+    "nizsheanez/yii2-asset-converter": "1.*",
+    "robregonm/yii2-pdf": "dev-master",
+    "zelenin/yii2-summernote-widget": "*"
   },
   "require-dev": {
     "yiisoft/yii2-codeception": "*",
     "yiisoft/yii2-debug": "*",
     "yiisoft/yii2-gii": "*",
-    "yiisoft/yii2-faker": "*",
-    "zelenin/yii2-summernote-widget": "*"
+    "yiisoft/yii2-faker": "*"
   },
   "config": {
     "process-timeout": 1800

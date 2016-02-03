@@ -156,7 +156,7 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             //['user_id', 'default', 'value' => NULL, 'on' => 'signup'],
             ['shared', 'safe', 'on' => 'sharing'],
-            ['password', 'safe', 'on' => 'import'],
+            [['author_id'], 'safe', 'on' => 'import'],
             [['university'], 'safe', 'on' => 'signup'],
             //[['email'], 'required', 'on' => 'signup'],
             [['parent_id'], 'integer', 'on' => 'signup'],
@@ -186,7 +186,7 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             'signup' => ['user_id', 'email', 'password', '!status', '!role', 'role_id', 'structure_id', 'phio', 'number', 'about', 'university_id'],
-            'import' => ['user_id', 'number', 'status', 'role_id', 'phio', 'password', 'structure_id', 'university_id', 'start_year'],
+            'import' => ['user_id', 'number', 'status', 'role_id', 'phio', 'password', 'structure_id', 'university_id', 'start_year', 'author_id'],
             'update' => ['user_id', 'email', 'password', '!status', '!role', 'role_id', 'structure_id', 'phio', 'number', 'about', 'university_id'],
             'sharing' => ['shared'],
             'default' => [],

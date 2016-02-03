@@ -23,6 +23,8 @@ use Yii;
  */
 class User extends \yii\web\User {
 
+	public $roleId;
+
 	public function getHomePageUrl() {
 		switch($this->identity->role_id) {
 			case (UserModel::ROLE_STUDENT):
@@ -38,5 +40,9 @@ class User extends \yii\web\User {
 
 	public function isGod() {
 		return $this->identity->role_id == UserModel::ROLE_GOD;
+	}
+
+	public function getRole() {
+		return Yii::$app->session->get('user.currentRole');
 	}
 }

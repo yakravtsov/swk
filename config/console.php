@@ -1,6 +1,7 @@
 <?php
 
 Yii::setAlias('@tests', dirname(__DIR__) . '/tests');
+Yii::setAlias('@importCsvOutput', dirname(__DIR__) . '/output');
 
 $params = require(__DIR__ . '/params.php');
 $db = require(__DIR__ . '/db.php');
@@ -28,6 +29,8 @@ return [
         'import'           => [
             'class'      => 'app\components\Import',
             'startRow'   => 0,
+            'hash'       => 'GVr9Z7vufM2c',
+            'outputPath' => '@importCsvOutput',
             'delimiter'  => ';',
             'columnsMap' => [
                 'phio'       => 0,

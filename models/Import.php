@@ -21,13 +21,38 @@ use yii\web\UploadedFile;
  * @property integer             $structure_id
  * @property integer             $status
  * @property integer             $try
+ * @property string             $csv
  *
  * @property Structure           $structure
  * @property University          $university
+ * @property ImportUsers[]          $users
  */
 class Import extends \yii\db\ActiveRecord {
 
 	const STATUS_WAITING = 0;
+	const STATUS_IN_PROCESS = 1;
+	const STATUS_ERROR = 2;
+	const STATUS_HAS_ERROR = 3;
+	const STATUS_SUCCESS = 4;
+	const STATUS_CSV_IN_PROCESS = 4;
+	const STATUS_OUTPUT_ERROR = 6;
+	const STATUS_IMPORTED = 7;
+
+	/**
+	 * @return Import[]|array
+	 */
+	public static function findReadyToPrepare() {
+		return self::find()->where(['status' => [self::STATUS_WAITING, self::STATUS_ERROR, self::STATUS_HAS_ERROR]])
+				->all();
+	}
+
+	/**
+	 * @return Import[]|array
+	 */
+	public static function findReadyToCsv() {
+		return self::find()->where(['status' => [self::STATUS_SUCCESS, self::STATUS_OUTPUT_ERROR]])
+		           ->all();
+	}
 
 	public function behaviors() {
 		return [
@@ -59,7 +84,7 @@ class Import extends \yii\db\ActiveRecord {
 		return [
 			[['university_id', 'structure_id'], 'required'],
 			[['university_id', 'structure_id', 'status', 'try'], 'integer'],
-			[['file'], 'file', 'skipOnEmpty' => FALSE, 'extensions' => 'csv', 'checkExtensionByMimeType' => FALSE, 'only'=>'insert'], //todo use mimetypes, not only extension of file
+			[['file'], 'file', 'skipOnEmpty' => FALSE, 'extensions' => 'csv', 'checkExtensionByMimeType' => FALSE, 'on'=>'insert'], //todo use mimetypes, not only extension of file
 		];
 	}
 
@@ -100,6 +125,13 @@ class Import extends \yii\db\ActiveRecord {
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
+	public function getUsers() {
+		return $this->hasMany(ImportUsers::className(), ['file_id' => 'file_id']);
+	}
+
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
 	public function getUniversity() {
 		return $this->hasOne(University::className(), ['university_id' => 'university_id']);
 	}
@@ -115,4 +147,5 @@ class Import extends \yii\db\ActiveRecord {
 	public function getPath() {
 		return __DIR__.'/../uploads/'.$this->file;
 	}
+
 }

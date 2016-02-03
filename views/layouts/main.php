@@ -120,14 +120,16 @@ $user_id = !Yii::$app->user->isGuest ? Yii::$app->user->identity->user_id : 0;
             </div>-->
             <? if(Url::current() != "/site/index"){?>
             <h4 class="text-left" style="margin: 0 auto 0;">
-                <?=Yii::$app->university->model->name;?>
+                <?/*=Yii::$app->university->model->name;*/?>
             </h4>
             <?}?>
             <div>&nbsp;</div>
 
+            <div class="hidden-print">
             <?= Breadcrumbs::widget([
                 'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
             ]) ?>
+            </div>
             <?= $content ?>
         </div>
     </div>

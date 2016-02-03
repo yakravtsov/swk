@@ -392,6 +392,22 @@ class UsersController extends Controller
 		return $this->redirect(Yii::$app->user->getHomePageUrl()); //redirect to any page you like.
 	}
 
+	public function actionRole($roleId) {
+		$initialId = Yii::$app->user->getId();
+		$initialRole = Yii::$app->user->identity->role_id; //here is the current ID, so you can go back after that.
+		if ($roleId <> $initialRole) {
+			$user     = User::findOne($initialId);
+			$duration = 0;
+			$user->role_id = $roleId;
+			Yii::$app->user->switchIdentity($user, $duration); //Change the current user.
+//			$duration = 0;
+//			Yii::$app->user->switchIdentity($user, $duration); //Change the current user.
+			Yii::$app->session->set('user.currentRole', $roleId); //Save in the session the id of your admin user.
+		}
+
+		return $this->redirect(Yii::$app->user->getHomePageUrl()); //redirect to any page you like.
+	}
+
 	public function actionStructures() {
 		if ($parents = Yii::$app->request->post('depdrop_parents')) {
 			if ($id = $parents[0]) {

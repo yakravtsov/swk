@@ -5,12 +5,11 @@ use yii\base\Behavior;
 use yii\base\Event;
 use yii\db\ActiveRecord;
 
-class AuthorBehavior extends Behavior
-{
+class AuthorBehavior extends Behavior {
+
 	public $attribute;
 
-	public function events()
-	{
+	public function events() {
 		return [
 			ActiveRecord::EVENT_BEFORE_INSERT => 'beforeInsert',
 		];
@@ -19,9 +18,9 @@ class AuthorBehavior extends Behavior
 	/**
 	 * @param $event Event
 	 */
-	public function beforeInsert($event)
-	{
-
-		$event->sender->author_id = is_null(\Yii::$app->user->getId()) ? 0 : \Yii::$app->user->getId();
+	public function beforeInsert($event) {
+		if (!$event->sender->author_id) {
+			$event->sender->author_id = is_null(\Yii::$app->user->getId()) ? 0 : \Yii::$app->user->getId();
+		}
 	}
 }
