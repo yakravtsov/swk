@@ -8,10 +8,19 @@ $config = [
 	'name'       => 'Электронное портфолио студента',
 	//'defaultRoute'=>'/works',
 	'components' => [
+		'authManager'  => [
+			'class'        => 'yii\rbac\PhpManager',
+			'defaultRoles' => [
+					'god',
+					'student',
+					'teacher',
+					'admin',
+			        'guest'
+			], // Здесь нет роли "guest", т.к. эта роль виртуальная и не присутствует в модели UserExt
+		],
 		'university'   => [
 			'class' => 'app\components\University',
 		],
-		// todo
 		'assetManager' => [
 			'converter' => [
 				'forceConvert' => TRUE,
@@ -84,7 +93,6 @@ $config = [
 			'showScriptName'      => FALSE,
 			'rules'               => [
 				'http://studentsonline.ru'              => 'land/index',
-				'http://studentsonline.ru/<agent:[\w-]+>' => 'land/agent',
 				'http://www.studentsonline.ru'          => 'land/index',
 				'http://studentsonline.ru/presentation' => 'land/presentation',
 				'http://studentsonline.ru/success'      => 'land/success',
