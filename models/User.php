@@ -33,6 +33,7 @@ use yii\web\IdentityInterface;
  * @property string $login_hash
  * @property integer $structure_id
  * @property integer $university_id
+ * @property integer $shared
  * @property string $password write-only password
  */
 class User extends ActiveRecord implements IdentityInterface
@@ -273,7 +274,7 @@ class User extends ActiveRecord implements IdentityInterface
             'status' => 'Статус',
             'login_hash' => 'Хэш входа',
             'structure_id' => 'ID структуры',
-            'number' => 'Номер зачётки',
+            'number' => '№ зачётки, документа',
             'structure' => 'Институт',
             'about' => 'О студенте',
             'start_year' => 'Год поступления',

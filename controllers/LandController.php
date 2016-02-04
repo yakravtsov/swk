@@ -8,14 +8,23 @@ use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\Landing;
+use app\models\Agent;
 
 class LandController extends Controller {
 
 	/**
 	 * @return string
 	 */
-	public function actionIndex() {
+	public function actionIndex($a=null)
+	{
 		$this->layout = '../layouts/land';
+
+		if (!is_null($a)) {
+			$agent = Agent::find()->where(['shortname' => $a])->One();
+		} else {
+			$agent = Agent::find()->where(['shortname' => 'onlineconsulting'])->One();
+		}
+		$this->view->params['agent'] = $agent;
 
 		Yii::$app->assetManager->bundles['yii\web\JqueryAsset'] = false;
 
@@ -37,14 +46,23 @@ class LandController extends Controller {
 			'model2' => $model2,
 			'model3' => $model3,
 			'model6' => $model6,
+			'agent' => $agent
 		]);
 	}
 
-	public function actionSuccess($type) {
+	public function actionSuccess($type,$a=null) {
 		$this->layout = '../layouts/land';
 
+		if (!is_null($a)) {
+			$agent = Agent::find()->where(['shortname' => $a])->One();
+		} else {
+			$agent = Agent::find()->where(['shortname' => 'onlineconsulting'])->One();
+		}
+		$this->view->params['agent'] = $agent;
+
 		return $this->render('success', [
-			'type' => $type
+			'type' => $type,
+			'agent' => $agent
 		]);
 	}
 

@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Agent;
 use Yii;
 use app\models\Landing;
 use app\models\search\LandingSearch;
@@ -49,13 +50,18 @@ class LandingController extends Controller
      */
     public function actionIndex()
     {
-        die();
+        //die();
+
+        $agents = Agent::find()->asArray()->all();
+
+
         $searchModel = new LandingSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'agents' => $agents
         ]);
     }
 
@@ -91,7 +97,6 @@ class LandingController extends Controller
 
     public function actionNew()
     {
-        return $this->redirect(['/success','type'=>3]);
         $model = new Landing();
         $form_id = Yii::$app->request->post($model->formName())['form_id'];
         $scenario = 'form_' . $form_id;
@@ -99,29 +104,41 @@ class LandingController extends Controller
 //            $this->refresh();
         }
 
+        $model->setScenario($scenario);
+
         if(in_array($form_id,[3,4,5])){
             $model->setScenario('form_3');
         }
 
-        $model->setScenario($scenario);
+        if(in_array($form_id,[1,2])){
+            $model->setScenario('form_1');
+        }
+
+        /*die(var_dump($_POST));*/
+
+
+        /**
+         * Отправка уведомлений
+         */
+        /*$r = Yii::$app->mailer->compose('/users/mail/recovery', ['contactForm' => $form])
+            ->setFrom(Yii::$app->params['noreplyEmail'])
+            ->setTo($form->email)
+            ->setSubject('Восстановление пароля')
+            ->send();
+        Yii::$app->session->addFlash('recoverySended', 'Вам отправлено письмо. Для завершения восстановления пароля перейдите по ссылке, указанной в письме.');
+        // send mail
+        // success flash
+        die(var_dump($r));*/
 
         if ($r = $model->load(Yii::$app->request->post()) && $s = $model->save()) {
-            switch ($model->scenario) {
-                case "form_3":
-                    return $this->redirect(['/success','type'=>$model->scenario]);
-                    break;
-                case "form_6":
-                    return $this->redirect(['/success','type'=>$model->scenario]);
-                    break;
-                default:
-                    return $this->redirect('//demo.studentsonline.ru');
-                    break;
-            }
+
+            $agent = $agent = Agent::find()->where(['agent_id' => $model->agent_id])->One();
+            //die(var_dump(Yii::$app->request->baseUrl));
+            return $this->redirect(['/success','type'=>preg_replace('/[^0-9.]+/', '', $model->scenario),'a'=>$agent->shortname]);
         } else {
             return $this->redirect('http://studentsonline.ru');
         }
     }
-
     /**
      * Updates an existing Landing model.
      * If update is successful, the browser will be redirected to the 'view' page.

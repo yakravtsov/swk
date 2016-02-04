@@ -2,11 +2,14 @@
 
 namespace app\controllers;
 
+use app\components\University;
 use app\models\File;
 use Yii;
 use app\models\StudentWorks;
 use app\models\search\StudentWorksSearch;
 use app\models\User;
+use app\models\Structure;
+use app\models\University as UniversityModel;
 use yii\helpers\Json;
 use yii\helpers\Url;
 use yii\helpers\VarDumper;
@@ -178,6 +181,17 @@ class WorksController extends Controller
 				'initialPreviewConfig' => $initialPreviewConfig
 			]);
 		}
+	}
+
+	public function actionPdf($id){
+		$model = $this->findModel($id);
+		$structure = Structure::find()->where(['structure_id'=>$model->author->structure_id])->One();
+		$university = UniversityModel::find()->where(['university_id'=>$model->author->university_id])->One();
+		return $this->render('pdf', [
+				'model' => $model,
+			'structure' => $structure,
+			'university' => $university
+		]);
 	}
 
 	/**

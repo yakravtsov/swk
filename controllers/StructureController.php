@@ -29,18 +29,17 @@ class StructureController extends Controller {
 				],
 			],
 			'access' => [
-				'class' => AccessControl::className(),
-				'ruleConfig' => [
+				'class'        => AccessControl::className(),
+				'ruleConfig'   => [
 					'class' => CustomAccessRule::className()
 				],
-				'rules' => [
+				'rules'        => [
 					[
 						'allow' => TRUE,
-						'roles' => ['structure', ['ownStructure', ['structure_id'=>Yii::$app->request->getQueryParam('id')]]],
+						'roles' => ['structure', ['ownStructure', ['structureId'=>Yii::$app->request->getQueryParam('id')]]],
 					],
 				],
 				'denyCallback' => function ($rule, $action) {
-//					die(Yii::$app->security->generatePasswordHash('0000'));
 					$this->redirect('/');
 				}
 			],
@@ -52,10 +51,13 @@ class StructureController extends Controller {
 	 * @return mixed
 	 */
 	public function actionIndex() {
-		$current_university = Yii::$app->university->model->university_id;
-		$query              = Structure::find()->where(['university_id' => $current_university]);
-		$searchModel        = new StructureSearch();
-		$dataProvider       = $searchModel->search(Yii::$app->request->queryParams, $query);
+		$query = Structure::find();
+		$query->where(['university_id' => Yii::$app->user->can('structure')
+			? Yii::$app->university->model->university_id
+			: Yii::$app->user->identity->university_id
+		              ]);
+		$searchModel  = new StructureSearch();
+		$dataProvider = $searchModel->search(Yii::$app->request->queryParams, $query);
 
 		return $this->render('index', [
 			'searchModel'  => $searchModel,
@@ -98,27 +100,22 @@ class StructureController extends Controller {
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model              = new Structure();
-		$current_university = Yii::$app->university->model->university_id;
-		$universities       = ArrayHelper::map(University::find()->AsArray()->All(), 'university_id', 'name');
+		$model = new Structure();
 		if ($model->load(Yii::$app->request->post())) {
-			if (Yii::$app->user->identity->role_id !== User::ROLE_GOD) {
-				$model->university_id = $current_university;
+			if (Yii::$app->user->can('structure') && empty($model->university_id)) {
+				$model->university_id = Yii::$app->university->model->university_id;
+			} else {
+				$model->university_id = Yii::$app->user->identity->university_id;
 			}
 			if ($model->save()) {
 				return $this->redirect(['view', 'id' => $model->structure_id]);
-			} else {
-				return $this->render('create', [
-					'model'        => $model,
-					'universities' => $universities
-				]);
 			}
-		} else {
-			return $this->render('create', [
-				'model'        => $model,
-				'universities' => $universities
-			]);
 		}
+
+		return $this->render('create', [
+			'model'        => $model,
+			'universities' => ArrayHelper::map(University::find()->AsArray()->All(), 'university_id', 'name')
+		]);
 	}
 
 	/**
@@ -130,27 +127,21 @@ class StructureController extends Controller {
 	 * @return mixed
 	 */
 	public function actionUpdate($id) {
-		$model              = $this->findModel($id);
-		$current_university = Yii::$app->university->model->university_id;
-		$universities       = ArrayHelper::map(University::find()->AsArray()->All(), 'university_id', 'name');
+		$model        = $this->findModel($id);
+		$universities = ArrayHelper::map(University::find()->AsArray()->All(), 'university_id', 'name');
 		if ($model->load(Yii::$app->request->post())) {
-//			if (Yii::$app->user->can('ownStructure', ['structureId'=>])) {
-//				$model->university_id = $current_university;
-//			}
+			if (!Yii::$app->user->can('structure')) {
+				$model->university_id = Yii::$app->university->model->university_id;
+			}
 			if ($model->save()) {
 				return $this->redirect(['view', 'id' => $model->structure_id]);
-			} else {
-				return $this->render('update', [
-					'model'        => $model,
-					'universities' => $universities
-				]);
 			}
-		} else {
-			return $this->render('update', [
-				'model'        => $model,
-				'universities' => $universities
-			]);
 		}
+
+		return $this->render('update', [
+			'model'        => $model,
+			'universities' => $universities
+		]);
 	}
 
 	/**

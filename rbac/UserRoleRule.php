@@ -16,6 +16,7 @@ class UserRoleRule extends Rule
 			Yii::info('Current role_id: ' . $role);
 			Yii::info('Current item name: ' . $item->name);
 			if ($item->name === 'admin') {
+				Yii::info('admin accssee');
 				return $role == User::ROLE_ADMINISTRATOR;
 			} elseif ($item->name === 'student') {
 				return $role == User::ROLE_STUDENT;

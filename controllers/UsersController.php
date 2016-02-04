@@ -1,7 +1,7 @@
 <?php
 namespace app\controllers;
 
-use app\models\Company;
+use app\components\CustomAccessRule;
 use app\models\Import;
 use app\models\LoginForm;
 use app\models\Structure;
@@ -13,8 +13,6 @@ use app\models\User;
 use app\models\search\UserSearch;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
-use yii\helpers\VarDumper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -24,26 +22,45 @@ use yii\web\UploadedFile;
 /**
  * UsersController implements the CRUD actions for User model.
  */
-class UsersController extends Controller
-{
+class UsersController extends Controller {
 
 	public function behaviors() {
 		return [
 			'access' => [
-				'class' => AccessControl::className(),
-				//                'only' => ['logout', 'about'],
-				'rules' => [
+				'class'        => AccessControl::className(),
+				'ruleConfig'   => [
+					'class' => CustomAccessRule::className()
+				],
+				'rules'        => [
 					[
-						'actions' => ['view', 'for', 'recovery'],
+						'actions' => ['for', 'recovery'],
 						'allow'   => TRUE,
 						'roles'   => ['?'],
 					],
 					[
-						//                        'actions' => ['*'],
-						'allow' => TRUE,
-						'roles' => ['@'],
+						'actions' => ['getpasswords'],
+						'allow'   => TRUE,
+						'roles'   => ['downloadImportResult'],
 					],
+					[
+						'actions' => ['update', 'view', 'sharing'],
+						'allow'   => TRUE,
+						'roles'   => ['users', ['ownUser', ['userId' => Yii::$app->request->getQueryParam('id')]]]
+					],
+					[
+						'actions' => ['index', 'create', 'delete', 'structures', 'import', 'students'],
+						'allow'   => TRUE,
+						'roles'   => ['users'],
+					],
+					[
+						'actions' => ['switch', 'role', 'email'],
+						'allow'   => TRUE,
+						'roles'   => ['switchIdentity'],
+					]
 				],
+				'denyCallback' => function ($rule, $action) {
+					return $this->redirect('/');
+				}
 			],
 			'verbs'  => [
 				'class'   => VerbFilter::className(),
@@ -54,47 +71,6 @@ class UsersController extends Controller
 		];
 	}
 
-	public function beforeAction($action) {
-		if (!parent::beforeAction($action)) {
-			return FALSE;
-		}
-		$role_id = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
-		if ($action->id == "index") {
-			switch ($role_id) {
-				case User::ROLE_ADMINISTRATOR:
-					return TRUE;
-					break;
-				case User::ROLE_GOD:
-					return TRUE;
-					break;
-				case User::ROLE_TEACHER:
-					return $this->redirect(['/users/students', 'id' => Yii::$app->user->identity->user_id]);
-					break;
-				default:
-					return $this->redirect('/');
-			}
-		}
-		if ($action->id == "getpasswords") {
-			switch ($role_id) {
-				case User::ROLE_ADMINISTRATOR:
-					return TRUE;
-					break;
-				default:
-					return $this->redirect('/users');
-			}
-		}
-
-		/*if ($role_id !== User::ROLE_ADMINISTRATOR || $role_id !== User::ROLE_TEACHER) {
-			return $this->redirect('/');
-		} else {
-			if($action->id == "index" && $role_id !== User::ROLE_TEACHER){
-				return $this->redirect('/users/students');
-			}
-		}*/
-
-		return TRUE; // or false to not run the action
-	}
-
 	/**
 	 * Lists all User models.
 	 * @return mixed
@@ -102,24 +78,20 @@ class UsersController extends Controller
 	public function actionIndex() {
 		$current_role       = Yii::$app->user->identity->role_id;
 		$current_university = Yii::$app->university->model->university_id;
-
 		/*$current_university = Yii::$app->user->identity->university_id;
 
 		echo Yii::$app->university->model->university_id;*/
-
 		$searchModel = new UserSearch();
 		/*$dataProvider = new ActiveDataProvider([
 			'query' => User::find()
 		]);*/
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams, $query = User::find()
 		                                                                                   ->where(['university_id' => $current_university]));
-
-
-		$authors    = ArrayHelper::map(User::find()->all(), 'id', 'phio');
-		$mo         = new User;
-		$statuses   = $mo->getStatusValues();
-		$roles      = $mo->getRoleValues();
-		$structures = ArrayHelper::map(Structure::find()->all(), 'structure_id', 'name');
+		$authors      = ArrayHelper::map(User::find()->all(), 'id', 'phio');
+		$mo           = new User;
+		$statuses     = $mo->getStatusValues();
+		$roles        = $mo->getRoleValues();
+		$structures   = ArrayHelper::map(Structure::find()->all(), 'structure_id', 'name');
 
 		return $this->render('index', [
 			'dataProvider' => $dataProvider,
@@ -175,7 +147,6 @@ class UsersController extends Controller
 		$universities = ArrayHelper::map(University::find()->AsArray()->All(), 'university_id', 'name');
 		if ($model->load(Yii::$app->request->post())) {
 			$model->generateLoginHash($model->email);
-
 			if (Yii::$app->user->identity->role_id !== User::ROLE_GOD) {
 				$model->university_id = $current_university;
 			}
@@ -245,24 +216,13 @@ class UsersController extends Controller
 		}
 	}
 
-	public function actionSharing($id,$shared) {
-		$role_id            = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
-		$current_university = Yii::$app->university->model->university_id;
-		$current_role       = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
-		$current_user       = Yii::$app->user->identity->user_id;
-		$model              = $this->findModel($id);
-		$model->scenario    = 'sharing';
-		if($model->role_id == User::ROLE_STUDENT){
-		$model->shared = $shared;
+	public function actionSharing($id, $shared) {
+		$model           = $this->findModel($id);
+		$model->scenario = 'sharing';
+		$model->shared   = $shared;
 		$model->save();
-		}
+
 		return $this->redirect(['view', 'id' => $model->id]);
-		/*if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			die(var_dump($model->shared));
-			return $this->redirect(['view', 'id' => $model->id]);
-		} else {
-			return $this->redirect(['view', 'id' => $model->id]);
-		}*/
 	}
 
 	/**
@@ -321,7 +281,6 @@ class UsersController extends Controller
 		                      ->setTo('yakravtsov@gmail.com')
 		                      ->setSubject('Восстановление пароля')
 		                      ->send();
-
 		die(var_dump($r));
 	}
 
@@ -335,9 +294,6 @@ class UsersController extends Controller
 			                      ->setSubject('Восстановление пароля')
 			                      ->send();
 			Yii::$app->session->addFlash('recoverySended', 'Вам отправлено письмо. Для завершения восстановления пароля перейдите по ссылке, указанной в письме.');
-			// send mail
-			// success flash
-			die(var_dump($r));
 		} else {
 			return $this->render('recovery', [
 				'model' => $form
@@ -393,16 +349,16 @@ class UsersController extends Controller
 	}
 
 	public function actionRole($roleId) {
-		$initialId = Yii::$app->user->getId();
+		$initialId   = Yii::$app->user->getId();
 		$initialRole = Yii::$app->user->identity->role_id; //here is the current ID, so you can go back after that.
 		if ($roleId <> $initialRole) {
-			$user     = User::findOne($initialId);
-			$duration = 0;
+			$user          = User::findOne($initialId);
+			$duration      = 0;
 			$user->role_id = $roleId;
 			Yii::$app->user->switchIdentity($user, $duration); //Change the current user.
-//			$duration = 0;
-//			Yii::$app->user->switchIdentity($user, $duration); //Change the current user.
-			Yii::$app->session->set('user.currentRole', $roleId); //Save in the session the id of your admin user.
+			//			$duration = 0;
+			//			Yii::$app->user->switchIdentity($user, $duration); //Change the current user.
+			Yii::$app->session->set('user.roleidbeforeswitch', $initialRole); //Save in the session the id of your admin user.
 		}
 
 		return $this->redirect(Yii::$app->user->getHomePageUrl()); //redirect to any page you like.

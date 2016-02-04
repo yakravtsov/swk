@@ -13,9 +13,11 @@ class UserStructureAccessRule extends Rule
 
 	public function execute($user, $item, $params)
 	{
+		if(!$sId = ArrayHelper::getValue($params, 'structureId')) {
+			return true;
+		}
 		Yii::trace('executing structure access rule');
-		$structure_id = ArrayHelper::getValue($params, 'structure_id');
-		$structure = Structure::findOne($structure_id);
-		return $structure_id ? Yii::$app->user->identity->university_id == $structure->university_id : false;
+		$structure = Structure::findOne($sId);
+		return $structure ? Yii::$app->user->identity->university_id == $structure->university_id : false;
 	}
 }

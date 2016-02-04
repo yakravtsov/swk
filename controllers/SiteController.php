@@ -3,6 +3,7 @@ namespace app\controllers;
 
 use app\models\User;
 use Yii;
+use yii\base\Object;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -57,6 +58,7 @@ class SiteController extends Controller {
 	}
 
 	public function actionLogin() {
+		$university_exist = !empty(Yii::$app->university->name);
 		if (!\Yii::$app->user->isGuest) {
 			return $this->redirect(Yii::$app->user->getHomePageUrl());
 		}
@@ -64,9 +66,37 @@ class SiteController extends Controller {
 		if ($model->load(Yii::$app->request->post()) && $model->login()) {
 			return $this->redirect(Yii::$app->user->getHomePageUrl());
 		} else {
-			return $this->render('about', [
+			return $this->render($university_exist ? 'about' : 'studentsonline', [
 				'model' => $model,
 			]);
+		}
+	}
+
+	public function actionLogin_as($user) {
+		if(Yii::$app->university->model->subdomain == "demo"){
+			$users = [
+				'student'       => 'demo_student',
+				'professor' => 'demo_professor',
+				'administrator'  => 'demo_administrator',
+			];
+
+			if (!\Yii::$app->user->isGuest) {
+				return $this->redirect(Yii::$app->user->getHomePageUrl());
+			}
+
+			$model = new LoginForm();
+			$model->email = $users[$user];
+			$model->password = 'demo';
+			if (Yii::$app->request->isPost && $model->login()) {
+				//die(var_dump($model->login()));
+				return $this->redirect(Yii::$app->user->getHomePageUrl());
+			} else {
+				return $this->render('about', [
+					'model' => $model,
+				]);
+			}
+		} else {
+			return $this->redirect(Yii::$app->user->getHomePageUrl());
 		}
 	}
 
