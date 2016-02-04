@@ -15,7 +15,6 @@ $config = [
 					'student',
 					'teacher',
 					'admin',
-			        'guest'
 			], // Здесь нет роли "guest", т.к. эта роль виртуальная и не присутствует в модели UserExt
 		],
 		'university'   => [

@@ -3,7 +3,6 @@ namespace app\rbac;
 
 use app\models\User;
 use Yii;
-use yii\helpers\VarDumper;
 use yii\rbac\Rule;
 
 class UserRoleRule extends Rule
@@ -26,6 +25,6 @@ class UserRoleRule extends Rule
 				return $role == User::ROLE_GOD;
 			}
 		}
-		return true;
+		return false;
 	}
 }

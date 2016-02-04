@@ -6,6 +6,7 @@ use Yii;
 use app\models\User;
 use app\models\University;
 use app\models\search\UniversitySearch;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -24,20 +25,19 @@ class UniversityController extends Controller
                     'delete' => ['post'],
                 ],
             ],
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => TRUE,
+                        'roles' => ['university'],
+                    ],
+                ],
+                'denyCallback' => function ($rule, $action) {
+                    $this->redirect('/');
+                }
+            ],
         ];
-    }
-
-    public function beforeAction($action)
-    {
-        if (!parent::beforeAction($action)) {
-            return FALSE;
-        }
-        $role_id = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
-        if($role_id !== User::ROLE_GOD) {
-            return $this->redirect('/');
-        } else {
-            return TRUE; // or false to not run the action
-        }
     }
 
     /**
