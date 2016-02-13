@@ -38,8 +38,6 @@ if ($role_id == User::ROLE_STUDENT) {
 <div class="student-works-view">
 
 	<h1><?= $model->title ?></h1>
-
-
 		<?
 
 		if (Yii::$app->user->id == $model->author_id || $role_id == User::ROLE_ADMINISTRATOR) {
@@ -83,6 +81,7 @@ if ($role_id == User::ROLE_STUDENT) {
 		<? ActiveForm::end();
 	} ?>
 
+	<div>&nbsp;</div>
 	<?= DetailView::widget([
 		'model'      => $model,
 		'attributes' =>

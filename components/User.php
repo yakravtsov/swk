@@ -31,6 +31,8 @@ class User extends \yii\web\User {
 				return Url::to(['users/view', 'id'=>$this->identity->user_id]);
 			case (UserModel::ROLE_ADMINISTRATOR):
 				return Url::to(['/users']);
+			case (UserModel::ROLE_AGENT):
+				return Url::to(['/agent/requests', 'id'=>$this->identity->user_id]);
 			case (UserModel::ROLE_TEACHER):
 				return Url::to(['/works']);
 			default:
@@ -39,10 +41,7 @@ class User extends \yii\web\User {
 	}
 
 	public function isGod() {
-		return $this->identity->role_id == UserModel::ROLE_GOD;
+		return !$this->isGuest && $this->identity->role_id == UserModel::ROLE_GOD;
 	}
 
-	public function getRole() {
-		return Yii::$app->session->get('user.currentRole');
-	}
 }

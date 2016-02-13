@@ -75,7 +75,8 @@ class University extends \yii\db\ActiveRecord {
 			['paid_till', 'safe'],
 			['subdomain', 'unique'],
 			[['db_port', 'tarif', 'status', 'type',/* 'paid_till'*/], 'integer'],
-			[['name'], 'string', 'max' => 100],
+			[['name'], 'string', 'max' => 255],
+			[['yandex_verification'], 'string', 'max' => 50],
 			[['db_host', 'db_user', 'db_name'], 'string', 'max' => 255],
 			[['db_pass'], 'string', 'max' => 30],
 			[['subdomain'], 'string', 'max' => 10]
@@ -102,6 +103,7 @@ class University extends \yii\db\ActiveRecord {
 			'status'        => 'Статус',
 			'subdomain'     => 'Поддомен',
 			'type'          => 'Тип',
+			'yandex_verification' => 'Яндекс'
 		];
 	}
 

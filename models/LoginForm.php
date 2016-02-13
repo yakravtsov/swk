@@ -76,7 +76,7 @@ class LoginForm extends Model
                 $this->_user = User::findByRecordBookId($this->email);
             }
             if($this->_user && $this->_user->role_id <> User::ROLE_GOD) {
-                if(Yii::$app->university->model->university_id <> $this->_user->university_id) {
+                if($this->_user->role_id <> User::ROLE_AGENT && Yii::$app->university->model->university_id <> $this->_user->university_id) {
                     $this->_user = false;
                 }
             }
@@ -125,8 +125,10 @@ class LoginForm extends Model
     public function attributeLabels()
     {
         return [
-            'email' => 'номер зачётки или email',
+            'email' => 'Логин',
             'password' => 'Пароль',
         ];
     }
+
+
 }

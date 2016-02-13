@@ -22,7 +22,8 @@ use yii\web\UploadedFile;
 /**
  * UsersController implements the CRUD actions for User model.
  */
-class UsersController extends Controller {
+class UsersController extends Controller
+{
 
 	public function behaviors() {
 		return [
@@ -76,8 +77,16 @@ class UsersController extends Controller {
 	 * @return mixed
 	 */
 	public function actionIndex() {
-		$current_role       = Yii::$app->user->identity->role_id;
-		$current_university = Yii::$app->university->model->university_id;
+		if (!Yii::$app->user->isGuest) {
+			$current_role = Yii::$app->user->identity->role_id;
+		}
+		$current_role = Yii::$app->user->isGuest ? 0 : Yii::$app->user->identity->role_id;
+		if (!Yii::$app->university->model) {
+			$current_university = 2;
+		} else {
+			$current_university = Yii::$app->university->model->university_id;
+		}
+
 		/*$current_university = Yii::$app->user->identity->university_id;
 
 		echo Yii::$app->university->model->university_id;*/
@@ -86,7 +95,8 @@ class UsersController extends Controller {
 			'query' => User::find()
 		]);*/
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams, $query = User::find()
-		                                                                                   ->where(['university_id' => $current_university]));
+		                                                                                   ->where(['university_id' => $current_university])
+		                                                                                   ->andWhere(['<>','role_id', User::ROLE_AGENT]));
 		$authors      = ArrayHelper::map(User::find()->all(), 'id', 'phio');
 		$mo           = new User;
 		$statuses     = $mo->getStatusValues();
@@ -133,11 +143,18 @@ class UsersController extends Controller {
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$current_university = Yii::$app->university->model->university_id;
-		$current_role       = Yii::$app->user->identity->role_id;
-		$model              = new User();
-		$model->scenario    = 'signup';
-		$structures         = ArrayHelper::map(Structure::find()->AsArray()->All(), 'structure_id', 'name');
+		if (!Yii::$app->user->isGuest) {
+			$current_role = Yii::$app->user->identity->role_id;
+		}
+		$current_role = Yii::$app->user->isGuest ? 0 : Yii::$app->user->identity->role_id;
+		if (!Yii::$app->university->model) {
+			$current_university = 2;
+		} else {
+			$current_university = Yii::$app->university->model->university_id;
+		}
+		$model           = new User();
+		$model->scenario = 'signup';
+		$structures      = ArrayHelper::map(Structure::find()->AsArray()->All(), 'structure_id', 'name');
 		if ($current_role == User::ROLE_GOD) {
 			$structures = ArrayHelper::map(Structure::find()->AsArray()->All(), 'structure_id', 'name');
 		} else {
@@ -177,15 +194,21 @@ class UsersController extends Controller {
 	 * @return mixed
 	 */
 	public function actionUpdate($id) {
-		$role_id            = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
-		$current_university = Yii::$app->university->model->university_id;
-		$current_role       = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
-		$current_user       = Yii::$app->user->identity->user_id;
-		$model              = $this->findModel($id);
-		$model->scenario    = 'update';
-		$structures         = ArrayHelper::map(Structure::find()->where(['university_id' => $current_university])
-		                                                ->AsArray()->All(), 'structure_id', 'name');
-		$universities       = ArrayHelper::map(University::find()->AsArray()->All(), 'university_id', 'name');
+		if (!Yii::$app->user->isGuest) {
+			$role_id      = Yii::$app->user->identity->role_id;
+			$current_user = Yii::$app->user->identity->user_id;
+		}
+		$role_id = Yii::$app->user->isGuest ? 0 : Yii::$app->user->identity->role_id;
+		if (!Yii::$app->university->model) {
+			$current_university = 2;
+		} else {
+			$current_university = Yii::$app->university->model->university_id;
+		}
+		$model           = $this->findModel($id);
+		$model->scenario = 'update';
+		$structures      = ArrayHelper::map(Structure::find()->where(['university_id' => $current_university])
+		                                             ->AsArray()->All(), 'structure_id', 'name');
+		$universities    = ArrayHelper::map(University::find()->AsArray()->All(), 'university_id', 'name');
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->id]);
 		} else {
@@ -217,12 +240,24 @@ class UsersController extends Controller {
 	}
 
 	public function actionSharing($id, $shared) {
-		$model           = $this->findModel($id);
-		$model->scenario = 'sharing';
-		$model->shared   = $shared;
-		$model->save();
+		$role_id            = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
+		$current_university = Yii::$app->university->model->university_id;
+		$current_role       = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
+		$current_user       = Yii::$app->user->identity->user_id;
+		$model              = $this->findModel($id);
+		$model->scenario    = 'sharing';
+		if ($model->role_id == User::ROLE_STUDENT) {
+			$model->shared = $shared;
+			$model->save();
+		}
 
 		return $this->redirect(['view', 'id' => $model->id]);
+		/*if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			die(var_dump($model->shared));
+			return $this->redirect(['view', 'id' => $model->id]);
+		} else {
+			return $this->redirect(['view', 'id' => $model->id]);
+		}*/
 	}
 
 	/**
@@ -294,6 +329,9 @@ class UsersController extends Controller {
 			                      ->setSubject('Восстановление пароля')
 			                      ->send();
 			Yii::$app->session->addFlash('recoverySended', 'Вам отправлено письмо. Для завершения восстановления пароля перейдите по ссылке, указанной в письме.');
+			// send mail
+			// success flash
+			//die(var_dump($r));
 		} else {
 			return $this->render('recovery', [
 				'model' => $form

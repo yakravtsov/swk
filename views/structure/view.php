@@ -9,7 +9,7 @@ use app\models\User;
 /* @var $model app\models\Structure */
 
 $this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Институты', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Подразделения', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="structure-view">
@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
             echo Html::a(Html::tag('i', '', ['class' => 'glyphicon glyphicon-pencil']) . ' Редактировать', ['update', 'id' => $model->structure_id], ['class' => 'btn btn-primary'])
                 . " " .
                 Html::a(Html::tag('i', '', ['class' => 'glyphicon glyphicon-trash']) . ' Удалить', ['delete', 'id' => $model->structure_id], ['class' => 'btn btn-danger',
-                    'data'  => ['confirm' => 'Вы уверены, что хотите удалить этот институт?',
+                    'data'  => ['confirm' => 'Вы уверены, что хотите удалить это подразделение?',
                         'method'  => 'post',]]);
         ?>
     </p>
@@ -39,7 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]) ?>
 
-    <h3>Студенты института</h3>
+    <h3>Студенты подразделения «<?= Html::encode($this->title) ?>»</h3>
 
     <?=
     GridView::widget([

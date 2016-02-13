@@ -24,6 +24,8 @@ class UserRoleRule extends Rule
 				return $role == User::ROLE_TEACHER;
 			} elseif ($item->name === 'god') {
 				return $role == User::ROLE_GOD;
+			} elseif ($item->name === 'agent') {
+				return $role == User::ROLE_AGENT;
 			}
 		}
 		return false;

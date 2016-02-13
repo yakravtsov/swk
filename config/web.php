@@ -37,6 +37,30 @@ $config = [
 			// !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
 			'cookieValidationKey' => 'qWAJRmarPcAvHIwgJun_QSkqwKSBeBZn',
 		],
+			'response' => [
+					'formatters' => [
+							'pdf' => [
+									'class' => 'robregonm\pdf\PdfResponseFormatter',
+									'mode' => '', // Optional
+									'format' => 'A4',  // Optional but recommended. http://mpdf1.com/manual/index.php?tid=184
+									'defaultFontSize' => 0, // Optional
+									'defaultFont' => '', // Optional
+									'marginLeft' => 5, // Optional
+									'marginRight' => 5, // Optional
+									'marginTop' => 0, // Optional
+									'marginBottom' => 16, // Optional
+									'marginHeader' => 9, // Optional
+									'marginFooter' => 9, // Optional
+									'orientation' => 'Landscape', // optional. This value will be ignored if format is a string value.
+									'options' => [
+										// mPDF Variables
+										// 'fontdata' => [
+										// ... some fonts. http://mpdf1.com/manual/index.php?tid=454
+										// ]
+									]
+							],
+					]
+			],
 		'cache'        => [
 			'class' => 'yii\caching\FileCache',
 		],
@@ -59,15 +83,32 @@ $config = [
 			'loginUrl'        => '/login'
 		],
 		'errorHandler' => [
+			'class' => 'app\components\ErrorHandler',
 			'errorAction' => 'site/error',
+		    'exceptionUserView' => '@app/views/errors/exceptionUser.php'
 		],
 		'mailer'       => [
-			'class'            => 'yii\swiftmailer\Mailer',
-			// send all mails to a file by default. You have to set
-			// 'useFileTransport' to false and configure a transport
-			// for the mailer to send real emails.
-			'useFileTransport' => TRUE,
+				'class' => 'yii\swiftmailer\Mailer',
+				'transport' => [
+						'class' => 'Swift_SmtpTransport',
+						'host' => 'smtp.yandex.ru',
+						'port' => '465',
+						'username' => 'pochta@studentsonline.ru',
+						'password' => '0kujCZt5',
+						'encryption' => 'ssl',
+				],
 		],
+		/*'mailer'       => [
+			'class' => 'yii\swiftmailer\Mailer',
+			'transport' => [
+				'class' => 'Swift_SmtpTransport',
+				'host' => '62.109.7.245',
+				'port' => '587',
+				'username' => 'postmaster@studentsonline.ru',
+				'password' => 'eR2EFsBi',
+				'encryption' => 'tls',
+			],
+		],*/
 		'log'          => [
 			'traceLevel' => YII_DEBUG ? 3 : 0,
 			'targets'    => [
@@ -93,6 +134,7 @@ $config = [
 			'rules'               => [
 				'http://studentsonline.ru'              => 'land/index',
 				'http://www.studentsonline.ru'          => 'land/index',
+				'http://u.studentsonline.ru'          => 'site/u',
 				'http://studentsonline.ru/presentation' => 'land/presentation',
 				'http://studentsonline.ru/success'      => 'land/success',
 				//'http://studentsonline.ru/landing/create' => 'landing/create',
@@ -100,13 +142,14 @@ $config = [
 				'debug/<controller>/<action>'           => 'debug/<controller>/<action>',
 				'<controller>/<action>'                 => '<controller>/<action>',
 				'login'                                 => 'site/login',
+				'login_as'                                 => 'site/login_as',
 			],
 		],
-		'session'      => [
+		/*'session'      => [
 			'class' => 'yii\mongodb\Session',
-		],
+		],*/
 		'db'           => require(__DIR__ . '/db.php'),
-		'mongodb'      => require(__DIR__ . '/mongodb.php'),
+		//'mongodb'      => require(__DIR__ . '/mongodb.php'),
 	],
 	'params'     => $params,
 ];

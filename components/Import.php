@@ -14,7 +14,7 @@ use yii\helpers\VarDumper;
 
 /**
  * Class Import
- *
+ * 
  * @property string $outputPath
  * @package app\components
  */
@@ -53,20 +53,21 @@ class Import extends Component {
 					$newUser['file_id']       = $file->file_id;
 					$newUser['university_id'] = $file->university_id;
 					$newUser['structure_id']  = $file->structure_id;
-					$newUser['author_id']     = $file->author_id;
-					$result                   = $this->storeTempUser($newUser);
+					$newUser['author_id']  = $file->author_id;
+					$result = $this->storeTempUser($newUser);
 					if (!$result) {
 						$this->lastError = "save error";
-						$file->status    = $file::STATUS_HAS_ERROR;
+						$file->status = $file::STATUS_HAS_ERROR;
 					};
 				} else {
 					$file->status = $file::STATUS_HAS_ERROR;
 				}
 			}
-			if ($file->status == $file::STATUS_IN_PROCESS) {
+			if($file->status == $file::STATUS_IN_PROCESS) {
 				$file->status = $file::STATUS_SUCCESS;
 			}
-			if ($file->save()) {
+			if($file->save()){
+
 			}
 			fclose($handle);
 		} else {
@@ -117,18 +118,17 @@ class Import extends Component {
 		if ($l = $provider->load($user, '') && $s = $provider->save()) {
 			return TRUE;
 		}
-		print 'load: ' . var_dump($l) . "\n";
-		print 'save: ' . var_dump($s) . "\n";
+		print 'load: '. var_dump($l) ."\n";
+		print 'save: '. var_dump($s) ."\n";
 		print VarDumper::dumpAsString($provider->getErrors());
-
 		return FALSE;
 	}
 
 	public function setOutputPath($path) {
-		if ($alias = Yii::getAlias($path)) {
+		if($alias = Yii::getAlias($path)) {
 			$path = $alias;
 		}
-		if (!is_dir($path)) {
+		if(!is_dir($path)) {
 			mkdir($path);
 		}
 		$this->_outputPath = $path;
@@ -136,7 +136,7 @@ class Import extends Component {
 		return $this;
 	}
 
-	public function getOutputPath() {
+	public function getOutputPath()  {
 		return $this->_outputPath;
 	}
 }

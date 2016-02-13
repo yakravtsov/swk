@@ -7,16 +7,16 @@ use yii\grid\GridView;
 /* @var $searchModel app\models\search\Structure */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Институты';
+$this->title = 'Подразделения';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="structure-index">
 
-    <h1><?=Html::tag('i','',['class'=>'glyphicon glyphicon-tower'])?> Институты</h1>
+    <h1><?=Html::tag('i','',['class'=>'glyphicon glyphicon-tower'])?> Подразделения</h1>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a(Html::tag('i','',['class'=>'glyphicon glyphicon-plus']) . ' Добавить институт', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a(Html::tag('i','',['class'=>'glyphicon glyphicon-plus']) . ' Добавить подразделение', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?= GridView::widget([

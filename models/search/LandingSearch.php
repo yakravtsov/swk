@@ -6,12 +6,16 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\Landing;
+use app\models\User;
 
 /**
  * LandingSearch represents the model behind the search form about `app\models\Landing`.
  */
 class LandingSearch extends Landing
 {
+
+    public $agent;
+
     /**
      * @inheritdoc
      */
@@ -19,7 +23,7 @@ class LandingSearch extends Landing
     {
         return [
             [['request_id', 'form_id'], 'integer'],
-            [['name', 'email', 'phone', 'params'], 'safe'],
+            [['name', 'email', 'phone', 'agent', 'agent_id', 'params'], 'safe'],
         ];
     }
 
@@ -39,9 +43,14 @@ class LandingSearch extends Landing
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params,$custom_query = false)
     {
-        $query = Landing::find();
+        if($custom_query){
+            $query = $custom_query;
+        } else {
+            $query = Landing::find();
+            $query->joinWith(['agent']);
+        }
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -55,6 +64,13 @@ class LandingSearch extends Landing
             return $dataProvider;
         }
 
+        $dataProvider->sort->attributes['agent'] = [
+            // The tables are the ones our relation are configured to
+            // in my case they are prefixed with "tbl_"
+            'asc' => ['agent.fullname' => SORT_ASC],
+            'desc' => ['agent.fullname' => SORT_DESC],
+        ];
+
         $query->andFilterWhere([
             'request_id' => $this->request_id,
             'form_id' => $this->form_id,
@@ -63,6 +79,7 @@ class LandingSearch extends Landing
         $query->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'email', $this->email])
             ->andFilterWhere(['like', 'phone', $this->phone])
+            ->andFilterWhere(['like', 'agent.fullname', $this->agent])
             ->andFilterWhere(['like', 'params', $this->params]);
 
         return $dataProvider;

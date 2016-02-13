@@ -89,3 +89,55 @@ a.desc:after {
     padding: 10px 20px;
     margin: 0 0 15px 0;
 }
+
+.navbar-discipline .navbar-text { color: #333333 !important; }
+/*
+.navbar-discipline .container-fluid { padding-left: 8px; }
+.navbar-discipline .navbar-text { margin-left: 0; }*/
+
+footer {
+
+}
+footer a {
+    font-weight: bold;
+}
+
+.navbar-top {  }
+
+.navbar-top li.active a.navbar-top-help { background: #5bc0de !important; }
+/*.navbar-top li.active a.navbar-top-help { color: #3c763d !important; }*/
+
+/*body.body-help [data-toggle=tooltip], body.body-help [data-toggle=tooltip]:hover, body.body-help [data-toggle=tooltip]:active { cursor: help; }
+body.body-help [data-toggle=tooltip] *, body.body-help [data-toggle=tooltip] *:hover, body.body-help [data-toggle=tooltip] *:active { cursor: help; }*/
+
+[data-toggle=tooltip].help-active { cursor: help; }
+[data-toggle=tooltip].help-active:hover { cursor: help; }
+[data-toggle=tooltip].help-active:active { cursor: help; }
+[data-toggle=tooltip].help-active * { cursor: help; }
+[data-toggle=tooltip].help-active *:hover { cursor: help; }
+[data-toggle=tooltip].help-active *:active { cursor: help; }
+
+.tooltip-inner {
+    white-space:pre-wrap;
+    padding-bottom: 5px;
+}
+
+.tooltip-inner strong {
+    display: inline-block;
+    padding-bottom: 1px;
+    font-size: 1.1em;
+}
+
+/*.navbar-top sup { color: #ffffff; }
+.tooltip.active  { font-size: 2em; }*/
+
+
+.demo-buttons .btn { margin-bottom: 10px; }
+
+.site-u .universities-list img { border-radius: 4px; position: relative; width: 75px; height: 75px; margin: 0 20px 0 0; }
+.site-u .universities-list h4 { color: #333333; }
+.site-u .universities-list:hover span { text-decoration: underline; }
+.login-form-links { margin-top: -10px; }
+.login-form-links a { display: inline-block; margin-right: 7px; }
+
+.university-logo img { border-radius: 8px; width: 125px; }

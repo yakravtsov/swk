@@ -18,10 +18,13 @@ use yii\widgets\ActiveForm;
 
     <?/*= $form->field($model, 'author_id')->textInput() */?>
 
-    <?= $form->field($model, 'name')->textInput(['maxlength' => 100]) ?>
+    <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
 
     <?= $form->field($model, 'subdomain')->textInput(['maxlength' => 10]) ?>
+
     <?= $form->field($model, 'paid_till')->textInput() ?>
+
+    <?= $form->field($model, 'yandex_verification')->textInput(['maxlength' => 50]) ?>
 
     <?= $form->field($model, 'tarif')->dropDownList($model->getTarifValues()) ?>
 

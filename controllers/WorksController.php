@@ -42,12 +42,23 @@ class WorksController extends Controller
 	 * @return mixed
 	 */
 
+	public function beforeAction($action) {
+		if (!parent::beforeAction($action)) {
+			return FALSE;
+		}
+
+		$this->view->params['structure'] = Structure::find()->where(['structure_id'=>Yii::$app->user->identity->structure_id])->One();
+		return TRUE;
+	}
+
 
 	public function actionIndex() {
-		$current_role = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
-		$current_university = Yii::$app->university->model->university_id;
-
-		$role_id = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
+		$role_id       = Yii::$app->user->isGuest ? 0 : Yii::$app->user->identity->role_id;
+		if(!Yii::$app->university->model){
+			$current_university = 2;
+		} else {
+			$current_university = Yii::$app->university->model->university_id;
+		}
 		$searchModel = new StudentWorksSearch();
 
 		switch ($role_id) {

@@ -22,7 +22,7 @@ class LandController extends Controller {
 		if (!is_null($a)) {
 			$agent = Agent::find()->where(['shortname' => $a])->One();
 		} else {
-			$agent = Agent::find()->where(['shortname' => 'onlineconsulting'])->One();
+			$agent = Agent::find()->where(['agent_id' => 2])->One();
 		}
 		$this->view->params['agent'] = $agent;
 

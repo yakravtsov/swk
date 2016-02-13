@@ -11,23 +11,21 @@ use yii\bootstrap\Modal;
 /* @var $this yii\web\View */
 /* @var $model app\models\User */
 
-$role_id = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
+$role_id            = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
 $current_university = Yii::$app->university->model;
 
-$this->title                   = $model->phio;
+$this->title = $model->phio;
 if ($role_id == User::ROLE_ADMINISTRATOR || $role_id == User::ROLE_GOD) {
-$this->params['breadcrumbs'][] = ['label' => 'Пользователи', 'url' => ['index']];
+	$this->params['breadcrumbs'][] = ['label' => 'Пользователи', 'url' => ['index']];
 }
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="user-view">
-	<h1>
-		<?= Html::tag('span',$model->phio/*,['/users/view','id'=>$model->user_id],[''=>'']*/); ?>
-	</h1>
-	<h4 class="text-left"><?=$model->roleLabel . ", " . mb_strtolower($model->structure['name'], 'utf8');?></h4>
-<!--	<h5 class="text-left"><?/*=Html::tag('i','',['class'=>'glyphicon glyphicon-education']) .  " " .Yii::$app->university->model->name;*/?></h5>
-	<h5 class="text-left"><?/*=Html::tag('i','',['class'=>'glyphicon glyphicon-tower']) .  " " . $model->structure['name'];*/?></h4>-->
-	<!--<h5><?/*= $model->roleLabel; */?>, <?/*= $model->structure['name']; */?></h5>-->
+	<h1><?= $model->roleLabel . " " . $model->phio; ?></h1>
+	<!--<h4 class="text-left"><?/*= $model->roleLabel . " " . $model->phio; */?></h4>-->
+	<!--	<h5 class="text-left"><? /*=Html::tag('i','',['class'=>'glyphicon glyphicon-education']) .  " " .Yii::$app->university->model->name;*/ ?></h5>
+	<h5 class="text-left"><? /*=Html::tag('i','',['class'=>'glyphicon glyphicon-tower']) .  " " . $model->structure['name'];*/ ?></h4>-->
+	<!--<h5><? /*= $model->roleLabel; */ ?>, <? /*= $model->structure['name']; */ ?></h5>-->
 
 	<? if ($role_id == User::ROLE_ADMINISTRATOR || $role_id == User::ROLE_STUDENT || $role_id == User::ROLE_GOD) { ?>
 		<p>
@@ -43,9 +41,9 @@ $this->params['breadcrumbs'][] = $this->title;
 						'method'  => 'post',
 					],
 				]);
-			}?>
+			} ?>
 			<?
-			if($model->role_id == User::ROLE_STUDENT) {
+			if ($model->role_id == User::ROLE_STUDENT) {
 				if (!$model->shared) {
 					echo Html::a(Html::tag('i', '', ['class' => 'glyphicon glyphicon-link']) . ' Открыть доступ по ссылке', ['sharing',
 					                                                                                                         'id' => $model->user_id, 'shared' => 1], [
@@ -72,16 +70,32 @@ $this->params['breadcrumbs'][] = $this->title;
 							'class'          => 'form-control',
 							'style'          => 'display: inline-block; width: 365px;',
 							'data-toggle'    => 'tooltip',
+							'data-trigger'   => 'manual',
+							'data-html'      => 'true',
 							'data-placement' => 'top',
-							'title'          => 'Скопируйте публичную ссылку на ваше портфолио'
+							'title'          => 'Ссылка скопирована<br>в буфер обмена'
 						]);
 
 					?>
 					<script type="text/javascript">
 						$(document).ready(function () {
-							$("input#shared_link:text").on('focus', function () {
-								$(this).select();
+							$("input#shared_link:text").on('click', function () {
+								var $this = $(this);
+								copyToClipboard("input#shared_link:text");
+								$this.select();
+								$this.tooltip('toggle');
+								setTimeout(function(){
+									$this.tooltip('toggle');
+								},2500);
 							});
+
+							function copyToClipboard(element) {
+								var $temp = $("<input>")
+								$("body").append($temp);
+								$temp.val($(element).val()).select();
+								document.execCommand("copy");
+								$temp.remove();
+							}
 						});
 					</script>
 				<?
@@ -93,6 +107,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	<? } ?>
 
 	<? if ($role_id == User::ROLE_ADMINISTRATOR || $role_id == User::ROLE_GOD) { ?>
+		<div>&nbsp;</div>
 		<?
 		echo DetailView::widget([
 			'model'      => $model,
@@ -104,8 +119,10 @@ $this->params['breadcrumbs'][] = $this->title;
 					'value'     => Html::a($model->getAuthor()['phio'], ['view',
 					                                                     'id' => $model->getAuthor()['user_id']], ['target' => '_blank',
 					                                                                                               'title'  => 'Откроется в новом окне']),
-					'format'    => 'raw'
+					'format'    => 'raw',
+				    'visible' => $model->getAuthor()['role_id'] !== User::ROLE_GOD
 				],
+				'number',
 				[
 					'attribute' => 'status',
 					'value'     => $model->getStatusLabel()
@@ -190,26 +207,26 @@ $this->params['breadcrumbs'][] = $this->title;
 	if ($model->role_id == User::ROLE_STUDENT) {
 		?>
 		<div>&nbsp;</div>
-		<nav class="navbar navbar-default">
+		<nav class="navbar navbar-default navbar-discipline">
 			<div class="container-fluid">
 				<!--<a href="#" class="btn btn-link navbar-btn"><i class="glyphicon glyphicon-user"></i> Общая
 					информация</a>-->
-					<p class="navbar-text"><strong>Деятельность:</strong></p>
-					<ul class="nav navbar-nav">
-
-						<?
-						foreach ($disciplines as $key => $d) {
-							?>
-							<li class="">
-								<a href="/works/studentworks?id=<?= $model->user_id ?>&discipline_id=<?= $key ?>"
-								   class="">
-									<?= $d ?>
-								</a>
-							</li>
-						<?
-						}
+				<p class="navbar-text"><strong style="color:#333;">Деятельность</strong></p>
+				<ul class="nav navbar-nav">
+					<li class=""><a href="/works/studentworks?id=<?= $model->user_id ?>" class="">Вся</a></li>
+					<?
+					foreach ($disciplines as $key => $d) {
 						?>
-					</ul>
+						<li class="">
+							<a href="/works/studentworks?id=<?= $model->user_id ?>&discipline_id=<?= $key ?>"
+							   class="">
+								<?= $d ?>
+							</a>
+						</li>
+					<?
+					}
+					?>
+				</ul>
 			</div>
 		</nav>
 

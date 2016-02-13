@@ -16,24 +16,67 @@ use yii\helpers\Html;
 <div class="success">
 	<div class="header-titles">
 		<?
-		if ($type == 3) { ?>
-			<div class="header-title">Ваш заказ принят</div>
-			<div class="header-subtitle">
-				С вами свяжется менеджер и расскажет о дальнейших действиях<br>по подключению ВУЗа к
-				электронному портфолио «Students Online»
-			</div>
-		<? } else { ?>
-			<div class="header-title">Ваша заявка принята</div>
-			<div class="header-subtitle">
-				С вами свяжется менеджер и подробно ответит на ваши вопросы
-			</div>
-		<? } ?>
+		switch ($type) {
+			case 1:
+				?>
+				<div class="header-title">Ваша заявка принята</div>
+				<div class="header-subtitle">
+					С вами свяжется менеджер и проведёт консультацию<br>по работе с демоверсией портфолио.
+				</div>
+				<?
+				break;
+			case 3:
+				?>
+				<div class="header-title">Ваш заказ принят</div>
+				<div class="header-subtitle">
+					С вами свяжется менеджер и расскажет о дальнейших действиях<br>по подключению вуза к
+					электронному портфолио «Students Online»
+				</div>
+				<?
+				break;
+			case 6:
+				?>
+				<div class="header-title">Ваша заявка принята</div>
+				<div class="header-subtitle">
+					С вами свяжется менеджер и подробно ответит на ваши вопросы
+				</div>
+				<?
+				break;
+			default:
+				//return $this->redirect('//demo.studentsonline.ru');
+				break;
+		}
+		?>
 	</div>
 	<div class="container">
 		<div class="ifthenelse">
 			Если по какой-то причине этого не произошло, пожалуйста, свяжитесь с нами самостоятельно,<br>
-			позвонив по телефону <strong>8 911 164-78-64</strong> или написав на
-			<strong>pochta@onlineconsulting.pro</strong>
+			позвонив по телефону <strong><?= $agent->phone ?></strong> или написав на
+			<strong><?= $agent->email ?></strong>
 		</div>
+
+		<?
+		switch ($type) {
+			case 1:
+				?>
+				<div>&nbsp;</div>
+				<a class="button-green" href="//demo.studentsonline.ru">Открыть демоверсию</a>
+				<?
+				break;
+			case 3:
+				?>
+				<a class="button-green" href="//studentsonline.ru">Вернуться на сайт</a>
+				<?
+				break;
+			case 6:
+				?>
+				<a class="button-green" href="//studentsonline.ru">Вернуться на сайт</a>
+				<?
+				break;
+			default:
+				//return $this->redirect('//demo.studentsonline.ru');
+				break;
+		}
+		?>
 	</div>
 </div>

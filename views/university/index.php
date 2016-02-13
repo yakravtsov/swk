@@ -40,7 +40,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
                 'format' => 'html'
             ],
-            'subdomain',
+            [
+                'attribute' => 'subdomain',
+                'value' => function ($data) {
+                    return Html::a($data->subdomain, '//' . $data->subdomain . ".studentsonline.ru",['target'=>'_blank']);
+                },
+                'format' => 'html'
+            ],
             // 'db_host',
             // 'db_port',
             // 'db_user',

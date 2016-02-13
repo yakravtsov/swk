@@ -11,62 +11,130 @@ use yii\helpers\Url;
 
 $role_id = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
 
-$this->title                   = 'Записи студентов';
-$this->params['breadcrumbs'][] = $this->title;
-if($role_id==User::ROLE_STUDENT){
-$access_url = Url::to(array_merge([Yii::$app->request->getPathInfo()], Yii::$app->request->getQueryParams(),['access_code'=>md5(Url::current().Yii::$app->user->identity->login_hash)]));
-//echo "<div><a href='{$access_url}'>Ссылка доступа</a></div>";
+$this->params['breadcrumbs'][] = ['label' => $user->phio, 'url' => ['users/view','id'=>$user->id]];
+if(empty($discipline_id)){
+	$this->params['breadcrumbs'][] = 'Все записи';
+} else {
+	$this->params['breadcrumbs'][] = ['label'=>'Все записи','url' => ['works/studentworks','id'=>$user->id]];
+	$this->params['breadcrumbs'][] = $disciplines[$discipline_id] . " деятельность";
 }
+$this->title = empty($discipline_id) ? 'Вся деятельность' : $disciplines[$discipline_id] . ' деятельность';
 ?>
 <div class="student-works-index">
 
 
-	<h1>
-		<?= Html::a($user->phio,['/users/view','id'=>$user->user_id],[''=>'']); ?>
-	</h1>
-	<h4 class="text-left"><?=$user->roleLabel . ", " . mb_strtolower($user->structure['name'], 'utf8');?></h4>
+	<h1><!--<i class="glyphicon glyphicon-th-list"></i> --><?=$this->title?></h1>
+	<!--<h1>
+		<i class="glyphicon glyphicon-th-list"></i>
+		<?/*= Html::a($user->phio, ['/users/view', 'id' => $user->user_id], [
+			'data-toggle'    => 'tooltip',
+			'data-placement' => 'right',
+			'data-html'      => "true",
+			'data-title'     => '<strong>Страница пользователя</strong><br>Нажмите для перехода'
+		]); */?>: записи
+	</h1>-->
+	<!--<h1>
+		<?/*= Html::a($user->phio, ['/users/view', 'id' => $user->user_id], [
+			'data-toggle'    => 'tooltip',
+			'data-placement' => 'right',
+			'data-html'      => "true",
+			'data-title'     => '<strong>Страница пользователя</strong><br>Нажмите для перехода'
+		]); */?>
+	</h1>-->
+	<h4 class="text-left"><?= $user->roleLabel . " " .
+		Html::a($user->phio, ['/users/view', 'id' => $user->user_id], [
+			'data-toggle'    => 'tooltip',
+			'data-placement' => 'right',
+			'data-html'      => "true",
+			'data-title'     => '<strong>Страница пользователя</strong><br>Нажмите для перехода'
+		]); ?></h4>
 
 	<? if ($role_id == User::ROLE_STUDENT) { ?>
 		<p>
-			<?= Html::a('<i class="glyphicon glyphicon-plus"></i> Добавить запись', ['create'], ['class' => 'btn btn-success']) ?>
+			<?= Html::a('<i class="glyphicon glyphicon-plus"></i> Добавить запись', ['create'], [
+				'class'          => 'btn btn-success',
+				'data-toggle'    => 'tooltip',
+				'data-placement' => 'right',
+				'data-html' => 'true',
+				'data-title'     =>
+					"<strong>Добавление записи</strong><br>Нажмите для внесения информации о новой записи"
+					//"<strong>Форма добавления записи</strong><br>Название, описание, файлы, вид деятельности и прочее"
+			]) ?>
 		</p>
 	<? } ?>
 	<div>&nbsp;</div>
-	<?php  //echo $this->render('_search', ['model' => $searchModel]); ?>
+	<?php //echo $this->render('_search', ['model' => $searchModel]); ?>
 
-	<nav class="navbar navbar-default">
+	<nav class="navbar navbar-default navbar-discipline" data-toggle="tooltip" data-placement="top" data-html="true"
+	data-title="<strong>Виды деятельности</strong><br>Нажмите на название для вывода необходимых записей">
 		<div class="container-fluid">
-				<p class="navbar-text"><strong>Деятельность:</strong></p>
-				<ul class="nav navbar-nav">
+			<p class="navbar-text"><strong>Деятельность</strong></p>
+			<ul class="nav navbar-nav">
+				<li class="<?= empty($discipline_id) ? 'active' : ''; ?>"><a
+						href="/works/studentworks?id=<?= $user->user_id ?>" class="">Вся</a></li>
 
-					<?
-					foreach ($disciplines as $key => $d) {
-						?>
-						<li class="<?=$discipline_id == $key ? 'active' : '' ?>"><a href="/works/studentworks?id=<?=$user->user_id?>&discipline_id=<?=$key?>" class=""><?=$d?></a></li>
-						<!--<a href="#" class="active btn btn-link navbar-btn"><?/*=$d*/?></a>-->
-					<?
-					}
+				<?
+				foreach ($disciplines as $key => $d) {
 					?>
-				</ul>
+					<li class="<?= $discipline_id == $key ? 'active' : '' ?>"><a
+							href="/works/studentworks?id=<?= $user->user_id ?>&discipline_id=<?= $key ?>"
+							class=""><?= $d ?></a></li>
+					<!--<a href="#" class="active btn btn-link navbar-btn"><?/*=$d*/ ?></a>-->
+				<?
+				}
+				?>
+			</ul>
 		</div>
 	</nav>
 
-
 	<?= GridView::widget([
-		'dataProvider' => $dataProvider,
-		'filterModel'  => $searchModel,
+		'dataProvider'     => $dataProvider,
+		'filterModel'      => $searchModel,
+		'filterRowOptions' => [
+			'data-toggle'    => 'tooltip',
+			'data-placement' => 'top',
+			'data-html'      => 'true',
+			'data-title'     =>
+				"<strong>Строка поиска записей</strong>\r\nВведите в поле искомый текст\r\nи нажмите «Enter»"
+		],
+		'headerRowOptions' => [
+			'data-toggle'    => 'tooltip',
+			'data-placement' => 'top',
+			'data-html'      => 'true',
+			'data-title'     =>
+				"<strong>Строка сортировки записей</strong>\r\nНажмите на название ячейки\r\nдля сортировки"
+		],
 		//'filterPosition'=> '',
 		//'tableOptions' =>['class' => 'table table-default table-no-border'],
 
-		'columns'      => [
+		/*'rowOptions' => function($model,$key,$index,$grid){
+			if($index == 0){
+				return [
+					'data-toggle'    => 'tooltip',
+					'data-placement' => 'top',
+					'data-html'      => 'true',
+					'data-title'     =>
+						"<strong>Строка сортировки записей</strong>\r\nНажмите на название ячейки\r\nдля сортировки"
+				];
+			}
+		},*/
+
+		'columns'          => [
 			//['class' => 'yii\grid\SerialColumn'],
 			//'updated',
 			//'author_id',
 			[
 				'attribute' => 'title',
 				//'label'     => 'Текст работы',
-				'value'     => function ($data) {
-					return Html::a($data['title'], ['view', 'id' => $data['work_id']], ['target' => '_blank', 'title' => 'Откроется в новом окне']);
+				'value'     => function ($data,$key,$index) {
+						$options = [
+							'data-toggle'    => 'tooltip',
+							'data-placement' => 'right',
+							'data-html'      => 'true',
+							'data-title'     =>
+								"<strong>Полный вариант записи</strong><br>Нажмите для просмотра"
+						];
+					return Html::a($data['title'], ['view', 'id' => $data['work_id']], $options);
 				},
 				'format'    => 'raw'
 			],
@@ -88,8 +156,8 @@ $access_url = Url::to(array_merge([Yii::$app->request->getPathInfo()], Yii::$app
 			[
 				'attribute' => 'comment',
 				'label'     => 'Описание',
-				'value'     => function($data){
-					return mb_substr($data['comment'],0,200,"UTF-8");
+				'value'     => function ($data) {
+					return mb_substr($data['comment'], 0, 200, "UTF-8");
 				},
 				'format'    => 'html'
 			],
@@ -106,7 +174,7 @@ $access_url = Url::to(array_merge([Yii::$app->request->getPathInfo()], Yii::$app
 			//'filename',
 			// 'type',
 			// 'mark',
-			 //'comment:ntext',
+			//'comment:ntext',
 			// 'discipline_id',
 			/*[
 				'attribute' => 'discipline_id',

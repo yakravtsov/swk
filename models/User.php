@@ -45,6 +45,8 @@ class User extends ActiveRecord implements IdentityInterface
     const ROLE_ADMINISTRATOR = 8;
     const ROLE_GOD = 16;
 
+    const ROLE_AGENT = 32;
+
     const STATUS_INACTIVE = 0;
     const STATUS_ACTIVE = 1;
 
@@ -176,7 +178,7 @@ class User extends ActiveRecord implements IdentityInterface
 //					Yii::$app->user->identity->role_id == self::ROLE_ADMINISTRATOR
                     return false;
                 }],*/
-            ['role_id', 'in', 'range' => [self::ROLE_TEACHER, self:: ROLE_STUDENT, self::ROLE_ADMINISTRATOR], 'on' => 'signup'],
+            ['role_id', 'in', 'range' => [self::ROLE_TEACHER, self:: ROLE_STUDENT, self::ROLE_ADMINISTRATOR, self::ROLE_AGENT], 'on' => 'signup'],
         ];
     }
 
@@ -214,7 +216,8 @@ class User extends ActiveRecord implements IdentityInterface
                 self::ROLE_TEACHER => 'Преподаватель',
                 self::ROLE_STUDENT => 'Студент',
                 self::ROLE_ADMINISTRATOR => "Администратор",
-                self::ROLE_GOD => "Супер администратор"
+                self::ROLE_GOD => "ROLE_GOD",
+                self::ROLE_AGENT => "Агент"
             ];
         } else {
             $role_values = [

@@ -1,6 +1,7 @@
 <?php
 namespace app\controllers;
 
+use app\models\University;
 use app\models\User;
 use Yii;
 use yii\base\Object;
@@ -40,7 +41,7 @@ class SiteController extends Controller {
 	public function actions() {
 		return [
 			'error'   => [
-				'class' => 'yii\web\ErrorAction',
+				'class' => 'components\actions\ErrorAction',
 			],
 			'captcha' => [
 				'class'           => 'yii\captcha\CaptchaAction',
@@ -144,11 +145,19 @@ class SiteController extends Controller {
 	}
 
 	public function actionGetmanual() {
-		Yii::$app->response->sendFile(Yii::$app->basePath . '/misc/manual.pdf', 'manual.pdf');
+		//$university = University::find()->where(['subdomain'=>$subdomain])->One();
+		Yii::$app->response->sendFile(Yii::$app->basePath . '/misc/manual.pdf', 'Руководство пользователя StudentsOnline.ru.pdf');
 		/*$file_url = 'http://www.myremoteserver.com/file.exe';
 		header('Content-Type: application/octet-stream');
 		header("Content-Transfer-Encoding: Binary");
 		header("Content-disposition: attachment; filename=\"" . basename($file_url) . "\"");
 		readfile($file_url); // do the double-download-dance (dirty but worky)*/
+	}
+
+	public function actionU(){
+		$universities = University::find()->orderBy(['name' => SORT_ASC])->asArray()->all();
+		return $this->render('u', [
+			'universities' => $universities,
+		]);
 	}
 }

@@ -4,12 +4,12 @@ $this->beginPage()
 	<!doctype html>
 	<html>
 	<head>
-		<title>Электронное портфолио обучающегося для ВУЗов по ФГОС 3+</title>
+		<title>Электронное портфолио обучающегося для вузов по ФГОС 3+</title>
 		<?php $this->head() ?>
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 		<meta property="og:url" content="studentsonline.onlineconsulting.pro">
 		<meta property="og:title"
-		      content="Электронное портфолио обучающегося — готовое решение для ВУЗов согласно ФГОС 3+">
+		      content="Электронное портфолио обучающегося — готовое решение для вузов согласно ФГОС 3+">
 		<meta property="og:description"
 		      content="Ознакомьтесь с возможностями и посмотрите демоверсию «Students Online» на сайте.">
 		<meta property="og:image" content="/landing/i/og_image.jpg">
@@ -60,11 +60,18 @@ $this->beginPage()
 			<header id="home">
 				<div class="container">
 					<div class="logo left">
-						<img src="/landing/i/logo.png" alt="Онлайн Консалтинг"/>
+						<?
+						$controller = Yii::$app->controller;
+						if($controller->action->id == "success"){
+							?><a href="/?a=<?=$this->params['agent']['shortname'];?>"><img src="/landing/i/logo.png" alt="StudentsOnline.ru"/></a><?
+						} else {
+							?><img src="/landing/i/logo.png" alt="StudentsOnline.ru"/><?
+						}
+						?>
 					</div>
 					<div class="contacts right">
-						<a class="phone" href="tel:89111647864">8 911 164-78-64</a>
-						<a class="email" href="mailto:pochta@studentsonline.ru">pochta@studentsonline.ru</a>
+						<a class="phone" href="tel:<?=$this->params['agent']['phone'];?>"><?=$this->params['agent']['phone'];?></a>
+						<a class="email" href="mailto:<?=$this->params['agent']['email'];?>"><?=$this->params['agent']['email'];?></a>
 					</div>
 					<div class="clear"></div>
 				</div>
@@ -83,8 +90,8 @@ $this->beginPage()
 						<img src="/landing/i/footer/made_in_Russia.png" alt="Сделано в России"/>
 					</div>
 					<div class="contacts right">
-						<a class="phone" href="tel:89111647864">8 911 164-78-64</a>
-						<a class="email" href="mailto:pochta@studentsonline.ru">pochta@studentsonline.ru</a>
+						<a class="phone" href="tel:<?=$this->params['agent']['phone'];?>"><?=$this->params['agent']['phone'];?></a>
+						<a class="email" href="mailto:<?=$this->params['agent']['email'];?>"><?=$this->params['agent']['email'];?></a>
 					</div>
 					<div class="clear"></div>
 					<div class="legal">© Онлайн Консалтинг, 2015. ОГРН 1137847243060. 198097, Санкт-Петербург, улица
@@ -98,35 +105,7 @@ $this->beginPage()
 	<?php $this->endBody() ?>
 	<!-- Yandex.Metrika counter -->
 	<script type="text/javascript">
-		(function (d, w, c) {
-			(w[c] = w[c] || []).push(function () {
-				try {
-					w.yaCounter33339158 = new Ya.Metrika({
-						id: 33339158,
-						clickmap: true,
-						trackLinks: true,
-						accurateTrackBounce: true,
-						webvisor: true
-					});
-				} catch (e) {
-				}
-			});
 
-			var n = d.getElementsByTagName("script")[0],
-				s = d.createElement("script"),
-				f = function () {
-					n.parentNode.insertBefore(s, n);
-				};
-			s.type = "text/javascript";
-			s.async = true;
-			s.src = "https://mc.yandex.ru/metrika/watch.js";
-
-			if (w.opera == "[object Opera]") {
-				d.addEventListener("DOMContentLoaded", f, false);
-			} else {
-				f();
-			}
-		})(document, window, "yandex_metrika_callbacks");
 	</script>
 	<noscript>
 		<div><img src="https://mc.yandex.ru/watch/33339158" style="position:absolute; left:-9999px;" alt=""/></div>

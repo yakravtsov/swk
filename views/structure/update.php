@@ -7,7 +7,7 @@ use app\models\User;
 /* @var $model app\models\Structure */
 
 $this->title = 'Редактирование: ' . ' ' . $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Институты', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Подразделения', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->structure_id]];
 $this->params['breadcrumbs'][] = 'Редактирование';
 ?>

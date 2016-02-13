@@ -24,7 +24,7 @@ $current_role = Yii::$app->user->identity->role_id;
 
     <?= $form->field($model, 'email')->textInput(['maxlength' => 255]) ?>
 
-    <?= $form->field($model, 'password')->passwordInput(['maxlength' => 32])->hint('Оставьте это поле пустым, чтобы оставить пароль без изменений.') ?>
+    <?= $form->field($model, 'password')->passwordInput(['maxlength' => 32])->hint($model->scenario == "update" ? 'Оставьте это поле пустым, чтобы оставить пароль без изменений.' : false) ?>
 
     <?//= $form->field($model, 'organization_id')->dropDownList($model->getOrganizations()) ?>
 

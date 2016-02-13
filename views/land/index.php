@@ -9,6 +9,8 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
+$controller = Yii::$app->controller;
+
 /* @var $this yii\web\View */
 /* @var $model app\models\Landing */
 /* @var $model5 app\models\Landing */
@@ -23,7 +25,7 @@ use yii\bootstrap\ActiveForm;
 		<a href="#demoversion">Демоверсия</a>
 		<a href="#packages">Тарифы</a>
 		<a href="#help">Бесплатная консультация</a>
-		<a href="/presentation" target="_blank">Скачать презентацию</a>
+		<a href="/presentation" class="download_presentation" target="_blank">Скачать презентацию</a>
 	</div>
 </nav>
 
@@ -35,7 +37,7 @@ use yii\bootstrap\ActiveForm;
 		<a href="#demoversion">Демоверсия</a>
 		<a href="#packages">Тарифы</a>
 		<a href="#help">Бесплатная консультация</a>
-		<a href="/presentation" target="_blank">Скачать презентацию</a>
+		<a href="/presentation" class="download_presentation" target="_blank">Скачать презентацию</a>
 	</div>
 </nav>
 
@@ -66,7 +68,7 @@ use yii\bootstrap\ActiveForm;
 			]); ?>
 
 			<?= $form->field($model, 'name')
-			         ->textInput(['class' => 'input-name', 'placeholder' => 'Введите название ВУЗа,'])
+			         ->textInput(['class' => 'input-name', 'placeholder' => 'Введите название вуза,'])
 			         ->label(FALSE) ?>
 
 			<?= $form->field($model, 'email')
@@ -77,6 +79,8 @@ use yii\bootstrap\ActiveForm;
 			         ->label(FALSE) ?>
 
 			<?= Html::activeHiddenInput($model, 'form_id', ['value' => 1]); ?>
+
+			<?= Html::activeHiddenInput($model, 'agent_id', ['value' => $agent->agent_id]); ?>
 
 			<?= Html::submitButton('Попробовать', ['class' => 'button-yellow']) ?>
 
@@ -206,7 +210,7 @@ use yii\bootstrap\ActiveForm;
 			]); ?>
 
 			<?= $form->field($model2, 'name')
-			         ->textInput(['class' => 'input-name', 'placeholder' => 'Введите название ВУЗа,'])
+			         ->textInput(['class' => 'input-name', 'placeholder' => 'Введите название вуза,'])
 			         ->label(FALSE) ?>
 
 			<?= $form->field($model2, 'email')
@@ -217,6 +221,8 @@ use yii\bootstrap\ActiveForm;
 			         ->label(FALSE) ?>
 
 			<?= Html::activeHiddenInput($model2, 'form_id', ['value' => 2]); ?>
+
+			<?= Html::activeHiddenInput($model2, 'agent_id', ['value' => $agent->agent_id]); ?>
 
 			<?= Html::submitButton('Попробовать', ['class' => 'button-yellow']) ?>
 
@@ -415,7 +421,7 @@ use yii\bootstrap\ActiveForm;
 			</p>
 				<p>
 					<strong>Следующая причина:</strong> на основе опроса
-				наших клиентов выяснилось, что решение задачи информационным отделом ВУЗа затягивается до бесконечности,
+				наших клиентов выяснилось, что решение задачи информационным отделом вуза затягивается до бесконечности,
 				ввиду отсутствия опыта разработки сложных программных решений. К отсутствию компетенции добавляются
 				временные и финансовые расходы на покупку, настройку и обслуживание оборудования, а также обеспечение
 				бесперебойного доступа к портфолио.
@@ -451,6 +457,8 @@ use yii\bootstrap\ActiveForm;
 
 			<?= Html::activeHiddenInput($model6, 'form_id', ['value' => 6]); ?>
 
+			<?= Html::activeHiddenInput($model6, 'agent_id', ['value' => $agent->agent_id]); ?>
+
 			<div class="form-group">
 				<?= Html::submitButton('Заказать консультацию', ['class' => 'button-green']) ?>
 			</div>
@@ -466,7 +474,7 @@ use yii\bootstrap\ActiveForm;
 			студентов, <span class="order-space"></span> терабайт памяти
 		</div>
 		<div class="form-subtitle">
-			Заполните форму ниже, вам перезвонит менеджер и расскажет о дальнейших действиях<br>по подключению ВУЗа к
+			Заполните форму ниже, вам перезвонит менеджер и расскажет о дальнейших действиях<br>по подключению вуза к
 			электронному портфолио «Students Online».
 		</div>
 
@@ -481,7 +489,7 @@ use yii\bootstrap\ActiveForm;
 		]); ?>
 
 		<?= $form->field($model3, 'name')
-		         ->textInput(['class' => 'input-name', 'placeholder' => 'Введите название ВУЗа,'])
+		         ->textInput(['class' => 'input-name', 'placeholder' => 'Введите название вуза,'])
 		         ->label(FALSE) ?>
 
 		<?= $form->field($model3, 'email')
@@ -492,6 +500,8 @@ use yii\bootstrap\ActiveForm;
 		         ->label(FALSE) ?>
 
 		<?= Html::activeHiddenInput($model3, 'form_id', ['value' => 3, 'class' => 'order-form_id']); ?>
+
+		<?= Html::activeHiddenInput($model3, 'agent_id', ['value' => $agent->agent_id]); ?>
 
 		<?= Html::submitButton('Оформить заказ', ['class' => 'button-yellow']) ?>
 
