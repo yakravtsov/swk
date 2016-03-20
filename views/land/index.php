@@ -6,6 +6,7 @@
  * Time: 23:23
  * All rights are reserved
  */
+use app\components\widgets\LandActiveForm;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
@@ -57,14 +58,11 @@ $controller = Yii::$app->controller;
 			<div class="form-subtitle">Заполните форму ниже и получите доступ<br>к демоверсии электронного портфолио
 			</div>
 
-			<?php $form = ActiveForm::begin([
+			<?php $form = LandActiveForm::begin([
 				'id'                     => $model->scenario,
 				'action'                 => '/landing/new',
 				'enableClientValidation' => TRUE,
 				'validateOnBlur'         => TRUE,
-				'fieldConfig'            => [
-					'errorOptions' => ['encode' => FALSE],
-				],
 			]); ?>
 
 			<?= $form->field($model, 'name')
@@ -84,7 +82,7 @@ $controller = Yii::$app->controller;
 
 			<?= Html::submitButton('Попробовать', ['class' => 'button-yellow']) ?>
 
-			<?php ActiveForm::end(); ?>
+			<?php LandActiveForm::end(); ?>
 
 		</div>
 		<div class="clear"></div>
@@ -149,40 +147,40 @@ $controller = Yii::$app->controller;
 	<div class="title">Внешний вид электронного портфолио</div>
 	<div class="container">
 		<div class="several several-4">
-			<a class="each" rel="gallery" href="/landing/i/screenshots/big/1.jpg"
+			<a class="each" rel="details" href="/landing/i/screenshots/big/1.jpg"
 			   data-fancybox-title="Главная страница. На данной странице указан ВУЗ, расположены форма входа для пользователей, а также ссылки на восстановление пароля и инструкцию по работе с электронным портфолио.">
 				<img src="/landing/i/screenshots/1.jpg" alt=""/>
 				<span>Главная страница</span>
 			</a>
-			<a class="each" rel="gallery" href="/landing/i/screenshots/big/2.jpg"
+			<a class="each" rel="details" href="/landing/i/screenshots/big/2.jpg"
 			   data-fancybox-title="Кабинет студента: список работ.">
 				<img src="/landing/i/screenshots/2.jpg" alt=""/>
 				<span>Студент:<br>список работ</span>
 			</a>
-			<a class="each" rel="gallery" href="/landing/i/screenshots/big/3.jpg" data-fancybox-title="">
+			<a class="each" rel="details" href="/landing/i/screenshots/big/3.jpg" data-fancybox-title="">
 				<img src="/landing/i/screenshots/3.jpg" alt=""/>
 				<span>Студент:<br>запись о работе</span>
 			</a>
-			<a class="each" rel="gallery" href="/landing/i/screenshots/big/4.jpg" data-fancybox-title="">
+			<a class="each" rel="details" href="/landing/i/screenshots/big/4.jpg" data-fancybox-title="">
 				<img src="/landing/i/screenshots/4.jpg" alt=""/>
 				<span>Студент:<br>создание записи</span>
 			</a>
 
-			<a class="each" rel="gallery" href="/landing/i/screenshots/big/5.jpg" data-fancybox-title="">
+			<a class="each" rel="details" href="/landing/i/screenshots/big/5.jpg" data-fancybox-title="">
 				<img src="/landing/i/screenshots/5.jpg" alt=""/>
 				<span>Преподаватель:<br>список работ</span>
 			</a>
-			<a class="each" rel="gallery" href="/landing/i/screenshots/big/6.jpg" data-fancybox-title="">
+			<a class="each" rel="details" href="/landing/i/screenshots/big/6.jpg" data-fancybox-title="">
 				<img src="/landing/i/screenshots/6.jpg" alt=""/>
 				<span>Преподаватель:<br>рецензирование работы</span>
 			</a>
 
-			<a class="each" rel="gallery" href="/landing/i/screenshots/big/7.jpg" data-fancybox-title="">
+			<a class="each" rel="details" href="/landing/i/screenshots/big/7.jpg" data-fancybox-title="">
 				<img src="/landing/i/screenshots/7.jpg" alt=""/>
 				<span>Администратор:<br>список пользователей</span>
 			</a>
 
-			<a class="each" rel="gallery" href="/landing/i/screenshots/big/8.jpg" data-fancybox-title="">
+			<a class="each" rel="details" href="/landing/i/screenshots/big/8.jpg" data-fancybox-title="">
 				<img src="/landing/i/screenshots/8.jpg" alt=""/>
 				<span>Администратор:<br>список кафедр</span>
 			</a>
@@ -199,7 +197,7 @@ $controller = Yii::$app->controller;
 
 		<div class="form">
 
-			<?php $form = ActiveForm::begin([
+			<?php $form = LandActiveForm::begin([
 				'id'                     => $model2->scenario,
 				'action'                 => '/landing/new',
 				'enableClientValidation' => TRUE,
@@ -226,7 +224,7 @@ $controller = Yii::$app->controller;
 
 			<?= Html::submitButton('Попробовать', ['class' => 'button-yellow']) ?>
 
-			<?php ActiveForm::end(); ?>
+			<?php LandActiveForm::end(); ?>
 
 		</div>
 
@@ -268,9 +266,9 @@ $controller = Yii::$app->controller;
 				<td>
 					<strong>Подключение</strong>
 				</td>
-				<td><img src="/landing/i/packages/check.png"</td>
-				<td><img src="/landing/i/packages/check.png"</td>
-				<td><img src="/landing/i/packages/check.png"</td>
+				<td><img src="/landing/i/packages/check.png" alt="Да" /></td>
+				<td><img src="/landing/i/packages/check.png" alt="Да" /></td>
+				<td><img src="/landing/i/packages/check.png" alt="Да" /></td>
 			</tr>
 			<tr>
 				<td>
@@ -278,9 +276,9 @@ $controller = Yii::$app->controller;
 					<br>
 					<em>Размещение логотипа, названия, контактной информации</em>
 				</td>
-				<td><img src="/landing/i/packages/check.png"</td>
-				<td><img src="/landing/i/packages/check.png"</td>
-				<td><img src="/landing/i/packages/check.png"</td>
+				<td><img src="/landing/i/packages/check.png" alt="Да" /></td>
+				<td><img src="/landing/i/packages/check.png" alt="Да" /></td>
+				<td><img src="/landing/i/packages/check.png" alt="Да" /></td>
 			</tr>
 			<tr>
 				<td>
@@ -288,9 +286,9 @@ $controller = Yii::$app->controller;
 					<br>
 					<em>Загрузка институтов, факультетов<br>и кафедр</em>
 				</td>
-				<td><img src="/landing/i/packages/check.png"</td>
-				<td><img src="/landing/i/packages/check.png"</td>
-				<td><img src="/landing/i/packages/check.png"</td>
+				<td><img src="/landing/i/packages/check.png" alt="Да" /></td>
+				<td><img src="/landing/i/packages/check.png" alt="Да" /></td>
+				<td><img src="/landing/i/packages/check.png" alt="Да" /></td>
 			</tr>
 			<tr>
 				<td>
@@ -298,9 +296,9 @@ $controller = Yii::$app->controller;
 					<br>
 					<em>Массовое добавление обучающихся, преподавателей и администраторов</em>
 				</td>
-				<td><img src="/landing/i/packages/check.png"</td>
-				<td><img src="/landing/i/packages/check.png"</td>
-				<td><img src="/landing/i/packages/check.png"</td>
+				<td><img src="/landing/i/packages/check.png" alt="Да" /></td>
+				<td><img src="/landing/i/packages/check.png" alt="Да" /></td>
+				<td><img src="/landing/i/packages/check.png" alt="Да" /></td>
 			</tr>
 			<tr>
 				<td>
@@ -308,9 +306,9 @@ $controller = Yii::$app->controller;
 					<br>
 					<em>Выезд консультанта для обучения пользованию портфолио</em>
 				</td>
-				<td><img src="/landing/i/packages/check.png"</td>
-				<td><img src="/landing/i/packages/check.png"</td>
-				<td><img src="/landing/i/packages/check.png"</td>
+				<td><img src="/landing/i/packages/check.png" alt="Да" /></td>
+				<td><img src="/landing/i/packages/check.png" alt="Да" /></td>
+				<td><img src="/landing/i/packages/check.png" alt="Да" /></td>
 			</tr>
 			<tr>
 				<td>
@@ -318,9 +316,9 @@ $controller = Yii::$app->controller;
 					<br>
 					<em>Круглосуточная поддержка пользователей по вопросам работы портфолио</em>
 				</td>
-				<td><img src="/landing/i/packages/check.png"</td>
-				<td><img src="/landing/i/packages/check.png"</td>
-				<td><img src="/landing/i/packages/check.png"</td>
+				<td><img src="/landing/i/packages/check.png" alt="Да" /></td>
+				<td><img src="/landing/i/packages/check.png" alt="Да" /></td>
+				<td><img src="/landing/i/packages/check.png" alt="Да" /></td>
 			</tr>
 			<tr>
 				<td>
@@ -328,9 +326,9 @@ $controller = Yii::$app->controller;
 					<br>
 					<em>Ежедневное дублирование размещённой информации на запасном сервере</em>
 				</td>
-				<td><img src="/landing/i/packages/check.png"</td>
-				<td><img src="/landing/i/packages/check.png"</td>
-				<td><img src="/landing/i/packages/check.png"</td>
+				<td><img src="/landing/i/packages/check.png" alt="Да" /></td>
+				<td><img src="/landing/i/packages/check.png" alt="Да" /></td>
+				<td><img src="/landing/i/packages/check.png" alt="Да" /></td>
 			</tr>
 			<tr>
 				<td>
@@ -338,9 +336,9 @@ $controller = Yii::$app->controller;
 					<br>
 					<em>Доступ ко всем новым функциям<br>и усовершенствованиям</em>
 				</td>
-				<td><img src="/landing/i/packages/check.png"</td>
-				<td><img src="/landing/i/packages/check.png"</td>
-				<td><img src="/landing/i/packages/check.png"</td>
+				<td><img src="/landing/i/packages/check.png" alt="Да" /></td>
+				<td><img src="/landing/i/packages/check.png" alt="Да" /></td>
+				<td><img src="/landing/i/packages/check.png" alt="Да" /></td>
 			</tr>
 			<tr>
 				<td>
@@ -379,14 +377,14 @@ $controller = Yii::$app->controller;
 					<em>Стоимость каджого последующего года использования</em>
 				</td>
 				<td>30 000 рублей</td>
-				<td>40 000 рублей</td>
 				<td>50 000 рублей</td>
+				<td>Согласно договору</td>
 			</tr>
 			<tr class="price">
 				<td>Стоимость</td>
 				<td>30 000 рублей</td>
-				<td>40 000 рублей</td>
 				<td>50 000 рублей</td>
+				<td>Индивидуальная</td>
 			</tr>
 			</tbody>
 			<tfoot>
@@ -441,7 +439,7 @@ $controller = Yii::$app->controller;
 
 	<div class="container">
 		<div class="form">
-			<?php $form = ActiveForm::begin([
+			<?php $form = LandActiveForm::begin([
 				'id'                     => $model6->scenario,
 				'action'                 => '/landing/new',
 				'enableClientValidation' => TRUE,
@@ -463,7 +461,7 @@ $controller = Yii::$app->controller;
 				<?= Html::submitButton('Заказать консультацию', ['class' => 'button-green']) ?>
 			</div>
 			<div class="clear"></div>
-			<?php ActiveForm::end(); ?>
+			<?php LandActiveForm::end(); ?>
 		</div>
 	</div>
 </div>
@@ -478,7 +476,7 @@ $controller = Yii::$app->controller;
 			электронному портфолио «Students Online».
 		</div>
 
-		<?php $form = ActiveForm::begin([
+		<?php $form = LandActiveForm::begin([
 			'id'                     => $model3->scenario,
 			'action'                 => '/landing/new',
 			'enableClientValidation' => TRUE,
@@ -505,7 +503,7 @@ $controller = Yii::$app->controller;
 
 		<?= Html::submitButton('Оформить заказ', ['class' => 'button-yellow']) ?>
 
-		<?php ActiveForm::end(); ?>
+		<?php LandActiveForm::end(); ?>
 	</div>
 </div>
 

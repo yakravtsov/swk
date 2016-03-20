@@ -141,21 +141,18 @@ class LandingController extends Controller
 		/**
 		 * Отправка уведомлений
 		 */
-		/*$r = Yii::$app->mailer->compose('/users/mail/recovery', ['contactForm' => $form])
-			->setFrom(Yii::$app->params['noreplyEmail'])
-			->setTo($form->email)
-			->setSubject('Восстановление пароля')
-			->send();
-		Yii::$app->session->addFlash('recoverySended', 'Вам отправлено письмо. Для завершения восстановления пароля перейдите по ссылке, указанной в письме.');
-		// send mail
-		// success flash
-		die(var_dump($r));*/
 
 		if ($r = $model->load(Yii::$app->request->post()) && $s = $model->save()) {
 
 			$agent = Agent::find()->where(['agent_id' => $model->agent_id])->One();
 
-
+			$r = Yii::$app->mailer;
+			$r->setTransport(Yii::$app->params['emailRobotTransport']);
+			$r->compose('/landing/mail/new', ['model' => $model,'agent'=>$agent])
+			  ->setFrom(Yii::$app->params['emailRobot'])
+			  ->setTo([$agent->email, 'pochta@studentsonline.ru', 'chikvin@gmail.com'])
+			  ->setSubject('Новая заявка с сайта')
+			  ->send();
 
 
 
@@ -217,51 +214,6 @@ class LandingController extends Controller
 		}
 	}
 
-	public function actionEmail2($id) {
-		$model = $this->findModel($id);
-		$agent = Agent::find()->where(['agent_id'=>$model->agent_id])->One();
-			return $this->renderPartial('/landing/mail/message', ['model' => $model,'agent'=>$agent]);
-		/*$r = Yii::$app->mailer->setTransport([
-				'class' => 'Swift_SmtpTransport',
-				'host' => 'smtp.yandex.ru',
-				'port' => '465',
-				'username' => 'robot@studentsonline.ru',
-				'password' => '0kujCZt5',
-				'encryption' => 'ssl',
-			]);*/
-		$r = Yii::$app->mailer;
-		$r->setTransport(Yii::$app->params['emailRobotTransport']);
-		                      $r->compose('/landing/mail/message', ['model' => $model,'agent'=>$agent])
-		                      ->setFrom(Yii::$app->params['emailRobot'])
-		                      ->setTo('pochta@studentsonline.ru')
-		                      ->setSubject('Новая заявка')
-			                  ->send();
-		//var_dump($r);
-		//Yii::$app->session->addFlash('recoverySended', 'Вам отправлено письмо. Для завершения восстановления пароля перейдите по ссылке, указанной в письме.');
-	}
-
-	public function actionEmail3() {
-		return $this->renderPartial('/landing/mail/artem', []);
-		$r = Yii::$app->mailer;
-		//$r->setTransport(Yii::$app->params['pochta']);
-		$r->compose('/landing/mail/artem', [])
-		  ->setFrom(Yii::$app->params['pochta'])
-		  ->setTo('yakravtsov@gmail.com')
-		  ->setSubject('Данные для доступа в портфолио СИФК')
-		  ->send();
-	}
-
-	public function actionEmail4() {
-		return $this->renderPartial('/landing/mail/sarsys', []);
-		$r = Yii::$app->mailer;
-		//$r->setTransport(Yii::$app->params['pochta']);
-		$r->compose('/landing/mail/sarsys', [])
-		  ->setFrom(Yii::$app->params['pochta'])
-		  ->setTo('yakravtsov@gmail.com')
-		  ->setSubject('Предложение о сотрудничестве')
-		  ->send();
-	}
-
 	public function actionAgent($id) {
 		//$model = $this->findModel($id);
 
@@ -276,5 +228,16 @@ class LandingController extends Controller
 			'dataProvider' => $dataProvider,
 			'agent'       => $agent
 		]);
+	}
+
+	public function actionEmail(){
+		return $this->renderPartial('/landing/mail/blank');
+		/*$r = Yii::$app->mailer;
+		$r->setTransport(Yii::$app->params['emailRobotTransport']);
+		$r->compose('/landing/mail/blank')
+		  ->setFrom(Yii::$app->params['pochta'])
+		  ->setTo(['yakravtsov@gmail.com'])
+		  ->setSubject('Важная информация для администратора портфолио')
+		  ->send();*/
 	}
 }

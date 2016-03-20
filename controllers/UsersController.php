@@ -34,7 +34,7 @@ class UsersController extends Controller
 				],
 				'rules'        => [
 					[
-						'actions' => ['for', 'recovery'],
+						'actions' => ['for', 'recovery','view'],
 						'allow'   => TRUE,
 						'roles'   => ['?'],
 					],
@@ -54,10 +54,19 @@ class UsersController extends Controller
 						'roles'   => ['users'],
 					],
 					[
+						'actions' => ['students','view'],
+						'allow'   => TRUE,
+						'roles'   => ['teacher'],
+					],
+					[
 						'actions' => ['switch', 'role', 'email'],
 						'allow'   => TRUE,
 						'roles'   => ['switchIdentity'],
-					]
+					],
+				    [
+					    'actions' => ['role'],
+				        'allow' => Yii::$app->user->isGod(),
+					],
 				],
 				'denyCallback' => function ($rule, $action) {
 					return $this->redirect('/');
@@ -87,21 +96,27 @@ class UsersController extends Controller
 			$current_university = Yii::$app->university->model->university_id;
 		}
 
+		if($current_role == User::ROLE_GOD) {
+			$all_universities   = University::find()->select('university_id')->asArray()->all();
+			$query = User::find()->where(['<>','role_id', User::ROLE_AGENT]);
+		} else {
+			$query = User::find()
+			             ->where(['university_id' => $current_university])
+			             ->andWhere(['<>','role_id', User::ROLE_AGENT]);
+		}
+
 		/*$current_university = Yii::$app->user->identity->university_id;
 
 		echo Yii::$app->university->model->university_id;*/
 		$searchModel = new UserSearch();
-		/*$dataProvider = new ActiveDataProvider([
-			'query' => User::find()
-		]);*/
-		$dataProvider = $searchModel->search(Yii::$app->request->queryParams, $query = User::find()
-		                                                                                   ->where(['university_id' => $current_university])
-		                                                                                   ->andWhere(['<>','role_id', User::ROLE_AGENT]));
+
+		$dataProvider = $searchModel->search(Yii::$app->request->queryParams, $query);
 		$authors      = ArrayHelper::map(User::find()->all(), 'id', 'phio');
 		$mo           = new User;
 		$statuses     = $mo->getStatusValues();
 		$roles        = $mo->getRoleValues();
 		$structures   = ArrayHelper::map(Structure::find()->all(), 'structure_id', 'name');
+		$universities   = ArrayHelper::map(University::find()->all(), 'university_id', 'name');
 
 		return $this->render('index', [
 			'dataProvider' => $dataProvider,
@@ -110,6 +125,7 @@ class UsersController extends Controller
 			'statuses'     => $statuses,
 			'roles'        => $roles,
 			'structures'   => $structures,
+		    'universities' => $universities
 		]);
 	}
 
@@ -119,8 +135,15 @@ class UsersController extends Controller
 	 * @param integer $id
 	 *
 	 * @return mixed
+	 * @throws NotFoundHttpException
+	 * @throws \yii\web\HttpException
 	 */
 	public function actionView($id) {
+		$student = User::find()->where(['user_id'=>$id])->One();
+		if(Yii::$app->user->isGuest && !$student->shared){
+			throw new \yii\web\HttpException(403, 'Доступ запрещён.', 403);
+		}
+
 		$searchModel  = new StudentWorksSearch();
 		$custom_query = StudentWorks::find()->where(['author_id' => $id]);
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams, $custom_query);
@@ -312,7 +335,7 @@ class UsersController extends Controller
 
 	public function actionEmail() {
 		$r = Yii::$app->mailer->compose('/users/mail/email')
-		                      ->setFrom(Yii::$app->params['noreplyEmail'])
+		                      ->setFrom(Yii::$app->params['emailRobot'])
 		                      ->setTo('yakravtsov@gmail.com')
 		                      ->setSubject('Восстановление пароля')
 		                      ->send();
@@ -324,7 +347,7 @@ class UsersController extends Controller
 		$form->scenario = 'requestPasswordResetToken';
 		if ($form->load(Yii::$app->request->post()) && $user = $form->recovery()) {
 			$r = Yii::$app->mailer->compose('/users/mail/recovery', ['contactForm' => $form])
-			                      ->setFrom(Yii::$app->params['noreplyEmail'])
+			                      ->setFrom(Yii::$app->params['emailRobot'])
 			                      ->setTo($form->email)
 			                      ->setSubject('Восстановление пароля')
 			                      ->send();
@@ -387,16 +410,9 @@ class UsersController extends Controller
 	}
 
 	public function actionRole($roleId) {
-		$initialId   = Yii::$app->user->getId();
 		$initialRole = Yii::$app->user->identity->role_id; //here is the current ID, so you can go back after that.
 		if ($roleId <> $initialRole) {
-			$user          = User::findOne($initialId);
-			$duration      = 0;
-			$user->role_id = $roleId;
-			Yii::$app->user->switchIdentity($user, $duration); //Change the current user.
-			//			$duration = 0;
-			//			Yii::$app->user->switchIdentity($user, $duration); //Change the current user.
-			Yii::$app->session->set('user.roleidbeforeswitch', $initialRole); //Save in the session the id of your admin user.
+			Yii::$app->session->set('user.role.switch', $roleId); //Save in the session the id of your admin user.
 		}
 
 		return $this->redirect(Yii::$app->user->getHomePageUrl()); //redirect to any page you like.

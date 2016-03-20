@@ -39,6 +39,7 @@ class RbacController extends Controller {
 		$structure    = $authManager->createPermission('structure');
 		$university   = $authManager->createPermission('university');
 		$indexUsers   = $authManager->createPermission('indexUsers');
+		$teacherStudents   = $authManager->createPermission('teacherStudents');
 		$downloadImportResult   = $authManager->createPermission('downloadImportResult');
 		$crudUsers   = $authManager->createPermission('crudUsers');
 
@@ -58,6 +59,7 @@ class RbacController extends Controller {
 		$authManager->add($ownStructure);
 		$authManager->add($university);
 		$authManager->add($indexUsers);
+		$authManager->add($teacherStudents);
 		$authManager->add($downloadImportResult);
 		$authManager->add($crudUsers);
 
@@ -87,6 +89,7 @@ class RbacController extends Controller {
 		// Teacher
 		$authManager->addChild($teacher, $student);
 		$authManager->addChild($admin, $indexUsers);
+		$authManager->addChild($admin, $teacherStudents);
 		// Admin
 		$authManager->addChild($admin, $delete);
 		$authManager->addChild($admin, $ownStructure);

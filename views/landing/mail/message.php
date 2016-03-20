@@ -12,8 +12,8 @@
 		<td style="padding:15px 15px 13px;color:#f6f6f6;background:#0063bf;line-height:22px;text-align:right;font-family:Arial;">
 			<a href="tel:89684300888" style="font-size:24px;color:#f6f6f6;text-decoration:none;"
 			   title="Позвонить в компанию">8 968 430-08-88</a><br>
-			<a href="mailto:info@onlineconsulting.pro"
-			   style="color:#dee8f1;font-size:12px;" title="Написать письмо в компанию">info@onlineconsulting.pro</a>
+			<a href="mailto:pochta@studentsonline.ru"
+			   style="color:#dee8f1;font-size:12px;" title="Написать письмо в компанию">pochta@studentsonline.ru</a>
 		</td>
 	</tr>
 	<!--<tr><td style="padding:15px;">фывавфыав!</td></tr>-->

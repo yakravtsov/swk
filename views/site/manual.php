@@ -8,22 +8,10 @@
 
 ?>
 
-<div class="alert alert-warning" role="alert">
-    <div class="pull-right">
-        <a href="" class="btn btn-success">
-            <i class="glyphicon glyphicon-edit"></i>
-            Продлить лицензию
-        </a>
-    </div>
-
-    <h5>Вы используете демоверсию электронного портфолио. До окончания пробного периода осталось <?=date('d');?> дней.</h5>
-    <h5>Закажите подключение </h5>
-</div>
-
 <h1>Инструкция по заполнению электронного портфолио</h1>
 <a href="javascript:window.history.go(-1);" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-menu-left"></i>
     Вернуться назад</a>
-<a href="/site/getmanual" target="_blank" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-download"></i>
+<a href="/site/getmanual" target="_blank" class="btn btn-info btn-sm"><i class="glyphicon glyphicon-download"></i>
     Скачать инструкцию в pdf</a>
 <div>&nbsp;</div>
 <p>

@@ -45,6 +45,6 @@ class DevController extends Controller {
 	}
 
 	public function actionError() {
-		sadas
+		//sadas
 	}
 }

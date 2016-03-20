@@ -14,6 +14,7 @@ class UserSearch extends User
 {
 
     public $structure;
+    public $university;
 
 
     /**
@@ -22,7 +23,7 @@ class UserSearch extends User
     public function rules()
     {
         return [
-            [['created', 'updated', 'email', 'phio', 'last_login', 'password_reset_token', 'password_hash','number','structure','start_year'], 'safe'],
+            [['created', 'updated', 'email', 'phio', 'last_login', 'password_reset_token', 'password_hash','number',/*'structure', 'university',*/'start_year'], 'safe'],
             [['author_id', 'user_id', 'role_id', 'status'], 'integer'],
         ];
     }
@@ -47,13 +48,16 @@ class UserSearch extends User
     {
         if(!$customQuery){
             $query = User::find();
-            $query->joinWith(['structure']);
-            $query->joinWith(['university']);
+            /*$query->joinWith(['structure']);
+            $query->joinWith(['university']);*/
         } else {
             $query = $customQuery;
+
         }
 
-
+        /*$query->joinWith(['structure'=>function($query) {
+            $query->joinWith(['university']);
+        }]);*/
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -62,7 +66,7 @@ class UserSearch extends User
             ],
         ]);
 
-        $dataProvider->sort->attributes['structure'] = [
+        /*$dataProvider->sort->attributes['structure'] = [
             // The tables are the ones our relation are configured to
             // in my case they are prefixed with "tbl_"
             'asc' => ['structure.name' => SORT_ASC],
@@ -74,7 +78,7 @@ class UserSearch extends User
             // in my case they are prefixed with "tbl_"
             'asc' => ['university.name' => SORT_ASC],
             'desc' => ['university.name' => SORT_DESC],
-        ];
+        ];*/
 
         $this->load($params);
 
@@ -99,8 +103,8 @@ class UserSearch extends User
         $query->andFilterWhere(['like', 'email', $this->email])
             ->andFilterWhere(['like', 'phio', $this->phio])
             ->andFilterWhere(['like', 'number', $this->number])
-            ->andFilterWhere(['like', 'university.name', $this->university])
-            ->andFilterWhere(['like', 'structure.name', $this->structure])
+            /*->andFilterWhere(['like', 'university.name', $this->university])
+            ->andFilterWhere(['like', 'structure.name', $this->structure])*/
             ->andFilterWhere(['like', 'password_reset_token', $this->password_reset_token])
             ->andFilterWhere(['like', 'password_hash', $this->password_hash]);
 

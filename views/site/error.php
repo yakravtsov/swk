@@ -8,20 +8,17 @@ use yii\helpers\Html;
 /* @var $exception Exception */
 
 $this->title = $name;
+$this->title = "Ошибка " . $exception->statusCode . ": " . $message;
 ?>
 <div class="site-error">
-
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <div class="alert alert-danger">
-        <?= nl2br(Html::encode($message)) ?>
-    </div>
+    <h1 class=""><?= Html::encode($this->title) ?></h1>
 
     <p>
-        The above error occurred while the Web server was processing your request.
+        Произошла ошибка во время выполнения вашего запроса.
     </p>
     <p>
-        Please contact us if you think this is a server error. Thank you.
+        Пожалуйста, напишите на <a href="mailto:pochta@studentsonline.ru">pochta@studentsonline.ru</a>, если вы считаете, что это ошибка программы. Спасибо.
     </p>
+    <a class="btn btn-primary" href="/"><i class="glyphicon glyphicon-home"></i> Перейти на главную</a>
 
 </div>

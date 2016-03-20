@@ -1,5 +1,5 @@
 <?php
-namespace app\components;
+namespace app\components\actions;
 /**
  * Created by Mota-systems company.
  * Author: Pavel Lamzin

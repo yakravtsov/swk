@@ -61,6 +61,10 @@ $this->beginPage()
 				<div class="container">
 					<div class="logo left">
 						<?
+						$phone = $this->params['agent']['phone'];
+						$phone_href = str_replace([' ','-'],'',$phone);
+							//str_replace(' ', '', $string);
+
 						$controller = Yii::$app->controller;
 						if($controller->action->id == "success"){
 							?><a href="/?a=<?=$this->params['agent']['shortname'];?>"><img src="/landing/i/logo.png" alt="StudentsOnline.ru"/></a><?
@@ -70,7 +74,7 @@ $this->beginPage()
 						?>
 					</div>
 					<div class="contacts right">
-						<a class="phone" href="tel:<?=$this->params['agent']['phone'];?>"><?=$this->params['agent']['phone'];?></a>
+						<a class="phone" href="tel:<?=$phone_href;?>"><?=$this->params['agent']['phone'];?></a>
 						<a class="email" href="mailto:<?=$this->params['agent']['email'];?>"><?=$this->params['agent']['email'];?></a>
 					</div>
 					<div class="clear"></div>

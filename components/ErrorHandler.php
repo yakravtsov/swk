@@ -1,5 +1,6 @@
 <?php
 namespace app\components;
+
 use Yii;
 use yii\base\UserException;
 use yii\web\HttpException;
@@ -8,6 +9,19 @@ use yii\web\Response;
 class ErrorHandler extends \yii\web\ErrorHandler {
 
 	public $exceptionUserView;
+	/**
+	 * @var string the path of the view file for rendering exceptions.
+	 */
+	//public $exceptionView = '@app/views/errors/mail/errorHandler/exception.php';
+	/**
+	 * @var string the path of the view file for rendering exceptions and errors call stack element.
+	 */
+	//public $callStackItemView = '@app/views/errors/mail/errorHandler/callStackItem.php';
+	/**
+	 * @var string the path of the view file for rendering previous exceptions.
+	 */
+	//public $previousExceptionView = '@app/views/errors/mail/errorHandler/previousException.php';
+
 	/**
 	 * Renders the exception.
 	 * @param \Exception $exception the exception to be rendered.
@@ -41,6 +55,7 @@ class ErrorHandler extends \yii\web\ErrorHandler {
 			} else {
 				// if there is an error during error rendering it's useful to
 				// display PHP error in debug mode instead of a blank screen
+				//echo var_dump(Yii::$app->controller->action->id);
 
 				if (Yii::$app->user->isGod()) {
 					ini_set('display_errors', 1);
@@ -65,5 +80,39 @@ class ErrorHandler extends \yii\web\ErrorHandler {
 		$response->send();
 	}
 
+	public function addTypeLinks($code,$style='')
+	{
+		if (preg_match('/(.*?)::([^(]+)/', $code, $matches)) {
+			$class = $matches[1];
+			$method = $matches[2];
+			$text = $this->htmlEncode($class) . '::' . $this->htmlEncode($method);
+		} else {
+			$class = $code;
+			$method = null;
+			$text = $this->htmlEncode($class);
+		}
+
+		$url = $this->getTypeUrl($class, $method);
+
+		if (!$url) {
+			return $text;
+		}
+
+		return '<a href="' . $url . '" style="' . $style . '" target="_blank">' . $text . '</a>';
+	}
+
+	public function createHttpStatusLink($statusCode, $statusDescription,$style='')
+	{
+		return '<a href="http://en.wikipedia.org/wiki/List_of_HTTP_status_codes#' . (int) $statusCode . '" style="' . $style . '" target="_blank">HTTP ' . (int) $statusCode . ' &ndash; ' . $statusDescription . '</a>';
+	}
+
+	public function renderPreviousExceptions($exception)
+	{
+		if (($previous = $exception->getPrevious()) !== null) {
+			return $this->renderFile($this->previousExceptionView, ['exception' => $previous]);
+		} else {
+			return '';
+		}
+	}
 
 }

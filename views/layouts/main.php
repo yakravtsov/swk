@@ -15,6 +15,8 @@ use yii\bootstrap\ButtonGroup;
 
 $university_exist = Yii::$app->university->model ? TRUE : FALSE;
 
+$university_id = $university_exist ? Yii::$app->university->model->university_id : 3;
+
 $user_id = !Yii::$app->user->isGuest ? Yii::$app->user->identity->user_id : 0;
 
 
@@ -52,8 +54,15 @@ SCRIPT;
 	<? } ?>
 
 	<meta name="google-site-verification" content="jgTPaCWlqYaXjkpxWZ2d2j-w0RjvSuMmINI2N4V-pTY"/>
+	<? if ($university_exist) {
+		?>
+		<link rel="shortcut icon" type="image/x-icon" href="/i/favicon.png"><?
+	} else {
+		?>
+		<link rel="shortcut icon" type="image/x-icon" href="/i/favicon_inside.png"><?
+	}
+	?>
 
-	<link rel="shortcut icon" type="image/x-icon" href="/i/favicon.png">
 </head>
 <body>
 
@@ -130,6 +139,21 @@ SCRIPT;
 	?>
 
 	<div class="container">
+<?if($university_exist && $university_id !== 7) {?>
+		<div class="alert alert-warning text-center" role="alert">
+			<!--<div class="pull-right">
+				<a href="" class="btn btn-success">
+					<i class="glyphicon glyphicon-edit"></i>
+					Подключить тариф
+				</a>
+			</div>-->
+			Вы используете демоверсию электронного портфолио <strong>StudentsOnline.ru</strong>. До окончания пробного периода осталось 10 <?/*= 27 - date('d'); */?>
+			дней.
+
+			<!--Нажмите на кнопку справа, чтобы подключить подходящий для вашего вуза тариф.-->
+			<div class="clearfix"></div>
+		</div>
+<?} ?>
 
 		<? /* echo ButtonGroup::widget([
 								'options'=>[
@@ -144,9 +168,10 @@ SCRIPT;
 
 		<!--<h4 class="text-left"><? /*=Html::tag('i','',['class'=>'glyphicon glyphicon-education']) .  " " .Yii::$app->university->model->name;*/ ?></h4>-->
 		<?
-		$no_hgroup = ["/site/index","/site/login"];
-		if (!in_array(Url::current(),$no_hgroup) && $university_exist) { ?>
-			<hgroup class="text-left">
+		$no_hgroup = ["/site/index", "/site/login"];
+		if (!in_array(Url::current(), $no_hgroup) && $university_exist) { ?>
+			<hgroup
+				class="text-left <?= !empty($this->params['viewUniversity']) && $this->params['viewUniversity'] ? "" : "hidden-print"; ?>">
 				<?
 				echo Html::tag('h4', Yii::$app->university->model->name, ['style' => 'margin:0 auto;']);
 				/**/ ?><!--<br>--><? /*
@@ -169,7 +194,7 @@ SCRIPT;
 	</div>
 </div>
 
-<footer class="footer">
+<footer class="footer hidden-print">
 	<div class="container">
 		<!--<p class="pull-left"><a href="//studentsonline.ru" target="_blank" data-toggle="tooltip" data-placement="top" title="Возможности сервиса, внешний вид, тарифы и прочее"><i class="glyphicon glyphicon-link"></i> Узнать больше о <strong>StudentsOnline.ru</strong></a></p>-->
 		<p class="pull-right text-muted">

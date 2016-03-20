@@ -1,4 +1,4 @@
-<? date_default_timezone_set('Europe/Moscow'); ?>
+<div style="overflow:hidden; float:left; display:none; line-height:0px;">Здравствуйте, Лилия! На связи Артём. В продолжение нашего разговора отправляю данные для доступа к портфолио вашего вуза…</div>
 <table width="600" cellpadding="0" cellspacing="0" border="0" style="background:#fdfdfd;border-collapse: collapse;">
 	<tr>
 		<td style="width:244px;padding:10px 15px 15px;color:#f6f6f6;background:#0063bf;text-align:center;font-family:Arial;">
@@ -12,8 +12,8 @@
 		<td style="padding:15px 15px 13px;color:#f6f6f6;background:#0063bf;line-height:22px;text-align:right;font-family:Arial;">
 			<a href="tel:89684300888" style="font-size:24px;color:#f6f6f6;text-decoration:none;"
 			   title="Позвонить в компанию">8 968 430-08-88</a><br>
-			<a href="mailto:info@onlineconsulting.pro"
-			   style="color:#dee8f1;font-size:12px;" title="Написать письмо в компанию">info@onlineconsulting.pro</a>
+			<a href="mailto:pochta@studentsonline.ru"
+			   style="color:#dee8f1;font-size:12px;" title="Написать письмо в компанию">pochta@studentsonline.ru</a>
 		</td>
 	</tr>
 	<!--<tr><td style="padding:15px;">фывавфыав!</td></tr>-->
@@ -25,7 +25,7 @@
 	<tr>
 		<td colspan="2"
 		    style="padding:20px 15px 10px;vertical-align:top;font-family:'Arial';line-height:24px;font-size:16px;">
-			Здравствуйте, Игорь!<br>
+			Здравствуйте, Лилия!<br>
 			На связи Артём. В продолжение нашего разговора отправляю данные для доступа к портфолио вашего вуза:
 		</td>
 	</tr>
@@ -35,7 +35,7 @@
 			<table width="570" cellpadding="0" cellspacing="0" border="0"
 			       style="color:#333333;border-collapse: collapse;font-family:'Arial';">
 				<tr>
-					<td colspan="4" style="padding:0 0 10px;"><b>Адрес:</b> <a href="http://sifk.studentsonline.ru" style="color:#0063bf;">sifk.studentsonline.ru</a></td>
+					<td colspan="4" style="padding:0 0 10px;"><b>Адрес:</b> <a href="http://kgtu.studentsonline.ru" style="color:#0063bf;">kgtu.studentsonline.ru</a></td>
 				</tr>
 				<tr>
 					<td style="padding: 5px 10px 5px 0;"><b>Роль</b></td>
@@ -47,41 +47,34 @@
 				<tr>
 					<td style="padding: 5px 10px 5px 0;border-top: 1px solid #d3d3d3;">Администратор</td>
 
-					<td style="padding: 5px 10px;border-top: 1px solid #d3d3d3;">sifkadmin</td>
-					<td style="padding: 5px 10px;border-top: 1px solid #d3d3d3;">sifkpass</td>
-					<td style="padding:5px 10px 5px;border-top: 1px solid #d3d3d3;">Игорь</td>
+					<td style="padding: 5px 10px;border-top: 1px solid #d3d3d3;">kgtuadmin</td>
+					<td style="padding: 5px 10px;border-top: 1px solid #d3d3d3;">kgtupass24</td>
+					<td style="padding:5px 10px 5px;border-top: 1px solid #d3d3d3;">Лилия Тихонова</td>
 				</tr>
 
 				<tr>
 					<td style="padding: 5px 10px 5px 0;border-top: 1px solid #d3d3d3;">Преподаватель</td>
 
-					<td style="padding: 5px 10px;border-top: 1px solid #d3d3d3;">sifkignatkova</td>
-					<td style="padding: 5px 10px;border-top: 1px solid #d3d3d3;">sifkpass</td>
-					<td style="padding:5px 10px 5px;border-top: 1px solid #d3d3d3;">Ирина Александровна Игнаткова</td>
+					<td style="padding: 5px 10px;border-top: 1px solid #d3d3d3;">kgtuprof</td>
+					<td style="padding: 5px 10px;border-top: 1px solid #d3d3d3;">kgtupass24</td>
+					<td style="padding:5px 10px 5px;border-top: 1px solid #d3d3d3;">Ветров Степан Яковлевич</td>
 				</tr>
 
 				<tr>
 					<td style="padding: 5px 10px 5px 0;border-top: 1px solid #d3d3d3;">Студент</td>
 
-					<td style="padding: 5px 10px;border-top: 1px solid #d3d3d3;">sifkgolovin</td>
-					<td style="padding: 5px 10px;border-top: 1px solid #d3d3d3;">sifkpass</td>
-					<td style="padding:5px 10px 5px;border-top: 1px solid #d3d3d3;">Анатолий Головин</td>
+					<td style="padding: 5px 10px;border-top: 1px solid #d3d3d3;">kgtustud</td>
+					<td style="padding: 5px 10px;border-top: 1px solid #d3d3d3;">kgtupass24</td>
+					<td style="padding:5px 10px 5px;border-top: 1px solid #d3d3d3;">Надежда Евсеева</td>
 				</tr>
 
 			</table>
 		</td>
 	</tr>
-
-	<tr>
-		<td colspan="2"
-		    style="padding:20px 15px 0;vertical-align:top;font-family:'Arial';line-height:24px;font-size:16px;">
-			Возможность выставления оценок будет реализована в течение этой недели. Пожалуйста, в ответном письме составьте список пожеланий к функционалу электронного портфолио.
-		</td>
-	</tr>
 	<tr>
 		<td colspan="2"
 		    style="padding:20px 15px 0;vertical-align:top;font-family:'Arial';line-height:22px;font-size:16px;">
-			Если у вас возникли вопросы по использованию сервиса, то обращайтесь по телефону: 8 968 430-08-88, либо
+			Если у вас возникли вопросы по использованию сервиса, обращайтесь по телефону: 8 968 430-08-88, либо
 			ответьте на данное письмо.
 		</td>
 	</tr>

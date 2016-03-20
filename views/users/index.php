@@ -45,6 +45,11 @@ $this->params['breadcrumbs'][] = $this->title;
 				'attribute' => 'structure',
 				'value'     => 'structure.name',
 			],
+			[
+				'attribute' => 'university',
+				'value'     => 'university.name',
+			    'visible' => !Yii::$app->user->isGuest && Yii::$app->user->identity->role_id == User::ROLE_GOD
+			],
 			'number',
 			/*[
 				 'attribute' => 'company_id',

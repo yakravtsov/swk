@@ -30,7 +30,7 @@ class WorksController extends Controller
 			'verbs' => [
 				'class'   => VerbFilter::className(),
 				'actions' => [
-					'delete' => ['post', 'delete'],
+					'delete'     => ['post', 'delete'],
 					'deletefile' => ['post', 'delete'],
 				],
 			],
@@ -47,14 +47,23 @@ class WorksController extends Controller
 			return FALSE;
 		}
 
-		$this->view->params['structure'] = Structure::find()->where(['structure_id'=>Yii::$app->user->identity->structure_id])->One();
+		if(!Yii::$app->user->isGuest){
+			$this->view->params['structure'] = Structure::find()
+			                                            ->where(['structure_id' => Yii::$app->user->identity->structure_id])
+			                                            ->One();
+		} else {
+			$this->view->params['structure'] = Structure::find()
+			                                            ->where(['structure_id' => 3])
+			                                            ->One();
+		}
+
 		return TRUE;
 	}
 
 
 	public function actionIndex() {
-		$role_id       = Yii::$app->user->isGuest ? 0 : Yii::$app->user->identity->role_id;
-		if(!Yii::$app->university->model){
+		$role_id = Yii::$app->user->isGuest ? 0 : Yii::$app->user->identity->role_id;
+		if (!Yii::$app->university->model) {
 			$current_university = 2;
 		} else {
 			$current_university = Yii::$app->university->model->university_id;
@@ -64,14 +73,25 @@ class WorksController extends Controller
 		switch ($role_id) {
 			case User::ROLE_TEACHER:
 				$structure_id   = yii::$app->user->identity->structure['structure_id'];
-				$ownStudents    = User::find()->where(['structure_id' => $structure_id])->andWhere(['university_id'=>$current_university])
+				$ownStudents    = User::find()->where(['structure_id' => $structure_id])
+				                      ->andWhere(['university_id' => $current_university])
 				                      ->andWhere(['role_id' => User::ROLE_STUDENT])->asArray()->All();
 				$ownStudentsIds = ArrayHelper::map($ownStudents, 'user_id', 'phio');
-				$custom_query   = StudentWorks::find()->where([StudentWorks::tableName().'.author_id' => array_keys($ownStudentsIds)]);
+				$custom_query   = StudentWorks::find()
+				                              ->where([StudentWorks::tableName() . '.author_id' => array_keys($ownStudentsIds)]);
+				break;
+
+			case User::ROLE_ADMINISTRATOR:
+				$ownStudents    = User::find()->where(['university_id' => $current_university])
+				                      ->andWhere(['role_id' => User::ROLE_STUDENT])->asArray()->All();
+				$ownStudentsIds = ArrayHelper::map($ownStudents, 'user_id', 'phio');
+				$custom_query   = StudentWorks::find()
+				                              ->where([StudentWorks::tableName() . '.author_id' => array_keys($ownStudentsIds)]);
 				break;
 
 			case User::ROLE_STUDENT:
-				$custom_query = StudentWorks::find()->where([StudentWorks::tableName().'.author_id' => Yii::$app->user->id]);
+				$custom_query = StudentWorks::find()
+				                            ->where([StudentWorks::tableName() . '.author_id' => Yii::$app->user->id]);
 
 //				return $this->redirect(['studentworks', 'id' => Yii::$app->user->id]);
 				break;
@@ -96,25 +116,30 @@ class WorksController extends Controller
 			'searchModel'  => $searchModel,
 			'dataProvider' => $dataProvider,
 			'statuses'     => $statuses,
-			'disciplines' => $disciplines
+			'disciplines'  => $disciplines
 		]);
 	}
 
-	public function actionStudentworks($id,$discipline_id = false) {
+	public function actionStudentworks($id, $discipline_id = FALSE) {
+		$student = User::find()->where(['user_id'=>$id])->One();
+		if(Yii::$app->user->isGuest && !$student->shared){
+			throw new \yii\web\HttpException(403, 'Доступ запрещён.', 403);
+		}
 
 		$searchModel = new StudentWorksSearch();
 
-		if($discipline_id){
+		if ($discipline_id) {
 			//$custom_query = StudentWorks::find()->where(['author_id' => $id])->andWhere(['discipline_id'=>$discipline_id]);
-			$custom_query = StudentWorks::find()->where(['discipline_id'=>$discipline_id])->andWhere([StudentWorks::tableName().'.author_id' => $id]);
+			$custom_query = StudentWorks::find()->where(['discipline_id' => $discipline_id])
+			                            ->andWhere([StudentWorks::tableName() . '.author_id' => $id]);
 		} else {
 			//$custom_query = StudentWorks::find()->where(['author_id' => $id]);
-			$custom_query = StudentWorks::find()->andWhere([StudentWorks::tableName().'.author_id' => $id]);
+			$custom_query = StudentWorks::find()->andWhere([StudentWorks::tableName() . '.author_id' => $id]);
 		}
 
 		$role_id = Yii::$app->user->isGuest ? User::ROLE_GUEST : Yii::$app->user->identity->role_id;
 
-		if($role_id == User::ROLE_STUDENT){
+		if ($role_id == User::ROLE_STUDENT) {
 			//$custom_query;
 		}
 
@@ -127,12 +152,12 @@ class WorksController extends Controller
 		$user = User::findOne($id);
 
 		return $this->render('index_student', [
-			'searchModel'  => $searchModel,
-			'dataProvider' => $dataProvider,
-			'statuses'     => $statuses,
-			'disciplines'  => $disciplines,
-		    'user' => $user,
-		    'discipline_id' => $discipline_id
+			'searchModel'   => $searchModel,
+			'dataProvider'  => $dataProvider,
+			'statuses'      => $statuses,
+			'disciplines'   => $disciplines,
+			'user'          => $user,
+			'discipline_id' => $discipline_id
 		]);
 	}
 
@@ -142,26 +167,40 @@ class WorksController extends Controller
 	 * @param integer $id
 	 *
 	 * @return mixed
+	 * @throws NotFoundHttpException
+	 * @throws \yii\web\HttpException
 	 */
 	public function actionView($id) {
 
-		$model = $this->findModel($id);
-		$initialPreview = [];
-		$initialPreviewConfig = [];
+		$model                = $this->findModel($id);
 
-		foreach($model->files as $file){
-			array_push($initialPreview,
-				Html::a(Html::tag('i','',['class'=>'glyphicon glyphicon-file']) . ' ' . $file->real_name,
-					Url::to(['/works/getfile', 'file'=>$file->file_id])
-				)
-			);
-			array_push($initialPreviewConfig,['url' => '/works/deletefile','key'=>$file->file_id]);
+		$student = User::find()->where(['user_id'=>$model->author_id])->One();
+		if(Yii::$app->user->isGuest && !$student->shared){
+			throw new \yii\web\HttpException(403, 'Доступ запрещён.', 403);
 		}
 
+		$initialPreview       = [];
+		$initialPreviewConfig = [];
+
+		foreach ($model->files as $file) {
+			array_push($initialPreview,
+				Html::a(Html::tag('i', '', ['class' => 'glyphicon glyphicon-file']) . ' ' . $file->real_name,
+					Url::to(['/works/getfile', 'file' => $file->file_id])
+				)
+			);
+			array_push($initialPreviewConfig, ['url' => '/works/deletefile', 'key' => $file->file_id]);
+		}
+
+		$teacher = User::find()->where(['user_id' => $model->teacher_id])->one();
+
+		$review = $this->renderPartial('review', ['model' => $model]);
+
 		return $this->render('view', [
-			'model' => $model,
-			'initialPreview' => $initialPreview,
-			'initialPreviewConfig' => $initialPreviewConfig
+			'model'                => $model,
+			'initialPreview'       => $initialPreview,
+			'initialPreviewConfig' => $initialPreviewConfig,
+			'teacher'              => $teacher,
+			'review'               => $review
 		]);
 	}
 
@@ -174,34 +213,57 @@ class WorksController extends Controller
 		$model = new StudentWorks();
 		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
 			$files = UploadedFile::getInstances($model, 'filename');
-			if($model->save()) {
-			foreach ($files as $file) {
-				$model->addFile($file);
-			}
+			if ($model->save()) {
+				foreach ($files as $file) {
+					$model->addFile($file);
+				}
+
 				return $this->redirect(['studentworks', 'discipline_id' => $model->discipline_id, 'id' => Yii::$app->user->id]);
 			} else {
 				return $this->refresh();
 			}
 		} else {
-			$initialPreview = [];
+			$initialPreview       = [];
 			$initialPreviewConfig = [];
 
 			return $this->render('create', [
-				'model' => $model,
-				'initialPreview' => $initialPreview,
+				'model'                => $model,
+				'initialPreview'       => $initialPreview,
 				'initialPreviewConfig' => $initialPreviewConfig
 			]);
 		}
 	}
 
-	public function actionPdf($id){
-		$model = $this->findModel($id);
-		$structure = Structure::find()->where(['structure_id'=>$model->author->structure_id])->One();
-		$university = UniversityModel::find()->where(['university_id'=>$model->author->university_id])->One();
+	public function actionPdf($id) {
+		Yii::$app->response->format = 'pdf';
+		$model                      = $this->findModel($id);
+		$teacher                    = User::find()->where(['user_id' => $model->teacher_id])->one();
+		$structure                  = Structure::find()->where(['structure_id' => $model->author->structure_id])->One();
+		$university                 = UniversityModel::find()->where(['university_id' => $model->author->university_id])
+		                                             ->One();
+
 		return $this->render('pdf', [
-				'model' => $model,
-			'structure' => $structure,
-			'university' => $university
+			'model'      => $model,
+			'structure'  => $structure,
+			'university' => $university,
+			'teacher'    => $teacher,
+		]);
+	}
+
+	public function actionPdf2($id) {
+		Yii::$app->response->format = 'pdf';
+		$model                      = $this->findModel($id);
+		$teacher                    = User::find()->where(['user_id' => $model->teacher_id])->one();
+		$structure                  = Structure::find()->where(['structure_id' => $model->author->structure_id])->One();
+		$university                 = UniversityModel::find()->where(['university_id' => $model->author->university_id])
+		                                             ->One();
+
+		//$this->layout = '//print';
+		return $this->render('pdf', [
+			'model'      => $model,
+			'structure'  => $structure,
+			'university' => $university,
+			'teacher'    => $teacher
 		]);
 	}
 
@@ -226,23 +288,23 @@ class WorksController extends Controller
 
 			return $this->redirect(['view', 'id' => $model->work_id]);
 		} else {
-			$initialPreview = [];
+			$initialPreview       = [];
 			$initialPreviewConfig = [];
 
-			foreach($model->files as $file){
+			foreach ($model->files as $file) {
 				array_push($initialPreview,
 					Html::img(
-						Url::to(['/works/getfile', 'file'=>$file->file_id]),
-						['class'=>'file-preview-image', 'alt'=>'The Moon', 'title'=>'The Moon']
+						Url::to(['/works/getfile', 'file' => $file->file_id]),
+						['class' => 'file-preview-image', 'alt' => 'The Moon', 'title' => 'The Moon']
 					)
 				);
-				array_push($initialPreviewConfig,['url' => '/works/deletefile','key'=>$file->file_id]);
+				array_push($initialPreviewConfig, ['url' => '/works/deletefile', 'key' => $file->file_id]);
 			}
 
 			return $this->render('update', [
-				'model' => $model,
-			    'initialPreview' => $initialPreview,
-			    'initialPreviewConfig' => $initialPreviewConfig
+				'model'                => $model,
+				'initialPreview'       => $initialPreview,
+				'initialPreviewConfig' => $initialPreviewConfig
 			]);
 		}
 	}
@@ -267,8 +329,7 @@ class WorksController extends Controller
 	 *
 	 * @return mixed
 	 */
-	public function actionDelete($id)
-	{
+	public function actionDelete($id) {
 		$this->findModel($id)->delete();
 
 		return $this->redirect(['index']);
@@ -291,18 +352,19 @@ class WorksController extends Controller
 		}
 	}
 
-	public function actionGetfile($file){
-		$file = File::findOne($file);
+	public function actionGetfile($file) {
+		$file  = File::findOne($file);
 		$model = $file->work;
-		$ext = pathinfo($file->path, PATHINFO_EXTENSION);
-		$name = "{$model->getAuthorName()}_{$file->real_name}.{$ext}";
+		$ext   = pathinfo($file->path, PATHINFO_EXTENSION);
+		$name  = "{$model->getAuthorName()}_{$file->real_name}.{$ext}";
 		Yii::$app->response->sendFile($file->path, $name);
 	}
 
 	public function actionDeletefile() {
-		$file = File::findOne(Yii::$app->request->post('key'));
+		$file  = File::findOne(Yii::$app->request->post('key'));
 		$model = $file->work;
 		$file->delete();
-		return true;
+
+		return TRUE;
 	}
 }

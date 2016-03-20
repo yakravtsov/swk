@@ -72,11 +72,11 @@ if (method_exists($this, 'beginPage')) {
 	<h1><?= $handler->htmlEncode($name) ?></h1>
 	<h2><?= nl2br($handler->htmlEncode($message)) ?></h2>
 	<p>
-		The above error occurred while the Web server was processing your request.
+		Извините, что-то пошло не так, но мы уже знаем и работаем над этим.
 	</p>
-	<p>
+	<!--<p>
 		Please contact us if you think this is a server error. Thank you.
-	</p>
+	</p>-->
 	<div class="version">
 		<?= date('Y-m-d H:i:s', time()) ?>
 	</div>

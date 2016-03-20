@@ -3,7 +3,7 @@ $params = require(__DIR__ . '/params.php');
 $config = [
 	'id'         => 'basic',
 	'basePath'   => dirname(__DIR__),
-	'language'   => 'ru-RU',
+	'language'   => 'ru',
 	'bootstrap'  => ['log', 'gii', 'university'],
 	'name'       => 'Электронное портфолио студента',
 	//'defaultRoute'=>'/works',
@@ -11,10 +11,10 @@ $config = [
 		'authManager'  => [
 			'class'        => 'yii\rbac\PhpManager',
 			'defaultRoles' => [
-					'god',
-					'student',
-					'teacher',
-					'admin',
+				'god',
+				'student',
+				'teacher',
+				'admin',
 			], // Здесь нет роли "guest", т.к. эта роль виртуальная и не присутствует в модели UserExt
 		],
 		'university'   => [
@@ -37,30 +37,33 @@ $config = [
 			// !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
 			'cookieValidationKey' => 'qWAJRmarPcAvHIwgJun_QSkqwKSBeBZn',
 		],
-			'response' => [
-					'formatters' => [
-							'pdf' => [
-									'class' => 'robregonm\pdf\PdfResponseFormatter',
-									'mode' => '', // Optional
-									'format' => 'A4',  // Optional but recommended. http://mpdf1.com/manual/index.php?tid=184
-									'defaultFontSize' => 0, // Optional
-									'defaultFont' => '', // Optional
-									'marginLeft' => 5, // Optional
-									'marginRight' => 5, // Optional
-									'marginTop' => 0, // Optional
-									'marginBottom' => 16, // Optional
-									'marginHeader' => 9, // Optional
-									'marginFooter' => 9, // Optional
-									'orientation' => 'Landscape', // optional. This value will be ignored if format is a string value.
-									'options' => [
-										// mPDF Variables
-										// 'fontdata' => [
-										// ... some fonts. http://mpdf1.com/manual/index.php?tid=454
-										// ]
-									]
-							],
-					]
-			],
+		'response'     => [
+			'formatters' => [
+				'pdf' => [
+					'class'           => 'robregonm\pdf\PdfResponseFormatter',
+					'mode'            => '', // Optional
+					'format'          => 'A4',  // Optional but recommended. http://mpdf1.com/manual/index.php?tid=184
+					'defaultFontSize' => 0, // Optional
+					'defaultFont'     => '', // Optional
+					'marginLeft'      => 5, // Optional
+					'marginRight'     => 5, // Optional
+					'marginTop'       => 5, // Optional
+					'marginBottom'    => 5, // Optional
+					'marginHeader'    => 3, // Optional
+					'marginFooter'    => 3, // Optional
+					'orientation'     => 'Portrait', // optional. This value will be ignored if format is a string value.
+					'options'         => [
+						// mPDF Variables
+						// 'fontdata' => [
+						// ... some fonts. http://mpdf1.com/manual/index.php?tid=454
+						// ]
+					],
+				    'methods' => [
+					    /*'setHTMLHeader' => 'asfasdf'*/
+				    ]
+				],
+			]
+		],
 		'cache'        => [
 			'class' => 'yii\caching\FileCache',
 		],
@@ -83,20 +86,20 @@ $config = [
 			'loginUrl'        => '/login'
 		],
 		'errorHandler' => [
-			'class' => 'app\components\ErrorHandler',
-			'errorAction' => 'site/error',
-		    'exceptionUserView' => '@app/views/errors/exceptionUser.php'
+			'class'             => 'app\components\ErrorHandler',
+			'errorAction'       => 'site/error',
+			'exceptionUserView' => '@app/views/errors/exceptionUser.php'
 		],
 		'mailer'       => [
-				'class' => 'yii\swiftmailer\Mailer',
-				'transport' => [
-						'class' => 'Swift_SmtpTransport',
-						'host' => 'smtp.yandex.ru',
-						'port' => '465',
-						'username' => 'pochta@studentsonline.ru',
-						'password' => '0kujCZt5',
-						'encryption' => 'ssl',
-				],
+			'class'     => 'yii\swiftmailer\Mailer',
+			'transport' => [
+				'class'      => 'Swift_SmtpTransport',
+				'host'       => 'smtp.yandex.ru',
+				'port'       => '465',
+				'username'   => 'pochta@studentsonline.ru',
+				'password'   => '0kujCZt5',
+				'encryption' => 'ssl',
+			],
 		],
 		/*'mailer'       => [
 			'class' => 'yii\swiftmailer\Mailer',
@@ -118,11 +121,12 @@ $config = [
 					'logFile' => '@app/log/error.log'
 				],
 				'email' => [
-					'class'   => 'yii\log\EmailTarget',
-					'levels'  => ['error', 'warning'],
+					'class'   => 'app\components\EmailTargetTrue',
+					'levels'  => ['error'/*, 'warning'*/],
 					'message' => [
-						'to'      => ['dostoevskiy.spb@gmail.com', 'yakravtsov@gmail.com'],
-						'subject' => 'SWK Error',
+						'from' => ['pochta@studentsonline.ru'=>'StudentsOnline.ru: Робот'],
+						'to'      => [/*'dostoevskiy.spb@gmail.com', */'dev@studentsonline.ru'],
+						'subject' => 'Ошибка в работе сервиса',
 					],
 				],
 			],
@@ -134,7 +138,7 @@ $config = [
 			'rules'               => [
 				'http://studentsonline.ru'              => 'land/index',
 				'http://www.studentsonline.ru'          => 'land/index',
-				'http://u.studentsonline.ru'          => 'site/u',
+				'http://u.studentsonline.ru'            => 'site/u',
 				'http://studentsonline.ru/presentation' => 'land/presentation',
 				'http://studentsonline.ru/success'      => 'land/success',
 				//'http://studentsonline.ru/landing/create' => 'landing/create',
@@ -142,7 +146,7 @@ $config = [
 				'debug/<controller>/<action>'           => 'debug/<controller>/<action>',
 				'<controller>/<action>'                 => '<controller>/<action>',
 				'login'                                 => 'site/login',
-				'login_as'                                 => 'site/login_as',
+				'login_as'                              => 'site/login_as',
 			],
 		],
 		/*'session'      => [
@@ -158,7 +162,7 @@ if (YII_ENV_DEV) {
 	$config['bootstrap'][]                    = 'debug';
 	$config['modules']['debug']               = [
 		'class'      => 'yii\debug\Module',
-		'allowedIPs' => ['127.0.0.1', '::1', '192.168.0.*', '176.117.143.48', '192.168.56.112', '217.71.236.160'],
+		'allowedIPs' => ['127.0.0.1', '::1', '192.168.0.*', '176.117.143.48', '192.168.56.112', '217.71.236.162', '217.71.236.160'],
 		'panels'     => [
 			'university' => ['class' => 'app\panels\UniversityPanel'],
 			'mongodb'    => [

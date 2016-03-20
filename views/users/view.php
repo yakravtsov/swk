@@ -66,7 +66,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					echo Html::tag('input', '',
 						[
 							'id'             => 'shared_link',
-							'value'          => "http://" . $current_university->subdomain . ".studentsonline.ru/users/view?id=" . Yii::$app->user->identity->user_id,
+							'value'          => "http://" . $current_university->subdomain . ".studentsonline.ru/users/view?id=" . $model->user_id,
 							'class'          => 'form-control',
 							'style'          => 'display: inline-block; width: 365px;',
 							'data-toggle'    => 'tooltip',

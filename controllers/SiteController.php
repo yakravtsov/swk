@@ -41,7 +41,7 @@ class SiteController extends Controller {
 	public function actions() {
 		return [
 			'error'   => [
-				'class' => 'components\actions\ErrorAction',
+				'class' => 'app\components\actions\ErrorAction',
 			],
 			'captcha' => [
 				'class'           => 'yii\captcha\CaptchaAction',
