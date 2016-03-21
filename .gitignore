@@ -29,7 +29,6 @@ phpunit.phar
 /phpunit.xml
 web/assets
 /import
-/assets
 /data
 /log
 /runtime
