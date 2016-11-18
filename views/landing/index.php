@@ -37,7 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     return $data->getFormLabel($data->form_id);
                 }
             ],
-            [
+            /*[
                 'attribute' => 'agent',
                 'label' => 'Агент',
                 'value'     => function ($data) {
@@ -45,7 +45,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
                 'format'    => 'raw',
                 //'visible'=> !Yii::$app->user->isGuest && Yii::$app->user->identity->role_id!==\app\models\User::ROLE_STUDENT
-            ],
+            ],*/
             // 'params:ntext',
 
             ['class' => 'yii\grid\ActionColumn'],

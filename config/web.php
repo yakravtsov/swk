@@ -162,7 +162,7 @@ if (YII_ENV_DEV) {
 	$config['bootstrap'][]                    = 'debug';
 	$config['modules']['debug']               = [
 		'class'      => 'yii\debug\Module',
-		'allowedIPs' => ['127.0.0.1', '::1', '192.168.0.*', '176.117.143.48', '192.168.56.112', '217.71.236.162', '217.71.236.160'],
+		'allowedIPs' => ['127.0.0.1', '::1', '192.168.0.*', '176.117.143.48', '192.168.56.112', '217.71.236.162', '217.71.236.160', '217.71.236.160'],
 		'panels'     => [
 			'university' => ['class' => 'app\panels\UniversityPanel'],
 			'mongodb'    => [

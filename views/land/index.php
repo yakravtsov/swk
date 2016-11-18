@@ -44,7 +44,7 @@ $controller = Yii::$app->controller;
 
 <div class="header-titles">
 	<div class="header-title">Электронное портфолио обучающегося</div>
-	<div class="header-subtitle">Готовое решение для ВУЗов согласно ФГОС 3+</div>
+	<div class="header-subtitle">Готовое решение для вузов согласно ФГОС 3+</div>
 </div>
 
 <div class="splash" id="demo">
@@ -148,7 +148,7 @@ $controller = Yii::$app->controller;
 	<div class="container">
 		<div class="several several-4">
 			<a class="each" rel="details" href="/landing/i/screenshots/big/1.jpg"
-			   data-fancybox-title="Главная страница. На данной странице указан ВУЗ, расположены форма входа для пользователей, а также ссылки на восстановление пароля и инструкцию по работе с электронным портфолио.">
+			   data-fancybox-title="Главная страница. На данной странице указан вуз, расположены форма входа для пользователей, а также ссылки на восстановление пароля и инструкцию по работе с электронным портфолио.">
 				<img src="/landing/i/screenshots/1.jpg" alt=""/>
 				<span>Главная страница</span>
 			</a>
@@ -414,7 +414,7 @@ $controller = Yii::$app->controller;
 				требованиям ФГОС 3+ во время аккредитации учебных заведений, использующих «Students Online».
 				</p>
 			<p>
-				<strong>Вторая причина:</strong> портфолио разработано в тесном сотрудничестве с преподавателями ВУЗов, что позволило сделать
+				<strong>Вторая причина:</strong> портфолио разработано в тесном сотрудничестве с преподавателями вузов, что позволило сделать
 				«Students Online» максимально удобным и понятным в использовании.
 			</p>
 				<p>

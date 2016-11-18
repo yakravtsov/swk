@@ -19,10 +19,10 @@ class LandController extends Controller {
 	{
 		$this->layout = '../layouts/land';
 
-		if (is_null($a)) {
-			$agent = Agent::find()->where(['agent_id' => 2])->One();
-		} else {
+		if (!is_null($a)) {
 			$agent = Agent::find()->where(['shortname' => $a])->One();
+		} else {
+			$agent = Agent::find()->where(['agent_id' => 2])->One();
 		}
 		$this->view->params['agent'] = $agent;
 

@@ -1,4 +1,6 @@
 <?php
+use kartik\widgets\DepDrop;
+use kartik\widgets\Select2;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
@@ -25,24 +27,24 @@ use yii\widgets\ActiveForm;
 
 	<?
 	if (Yii::$app->user->isGod()) {
-		echo $form->field($model, 'university_id')->widget(\kartik\widgets\Select2::className(), [
+		echo $form->field($model, 'university_id')->widget(Select2::className(), [
 			'data' => $universityData,
 		    'options'=>['id'=>'uni', 'placeholder'=>'...']
 			//'disabled' => true
-		]);
+		])->label('Университет');
 	}
 	?>
 
-	<?= $form->field($model, 'structure_id')->widget(\kartik\widgets\DepDrop::className(), [
-		'type'          => \kartik\depdrop\DepDrop::TYPE_SELECT2,
-		'options'       => ['structure_id' => 'label'],
+	<?= $form->field($model, 'structure_id')->widget(Select2::className()/*DepDrop::className()*/, [
+		//'type'          => \kartik\depdrop\DepDrop::TYPE_SELECT2,
+		//'options'       => ['structure_id' => 'label'],
 		'pluginOptions' => [
 			'depends'     => ['uni'],
-			'placeholder' => 'Select...',
+			'placeholder' => 'Выберите подразделение',
 			'url'         => Url::to(['/users/structures'])
 		]
 		//		'disabled' => true
-	])
+	])->label('Подразделение')
 	?>
 	<!--<input type="hidden" name="company_id" value="<? /*=$company_id */ ?>"/>-->
 
@@ -67,8 +69,8 @@ use yii\widgets\ActiveForm;
 		</div>
 	</div>
 
-	<div class="form-group text-center">
-		<?= Html::submitButton(Html::tag('i', '', ['class' => 'glyphicon glyphicon-save']) . ' Импортировать сотрудников ', ['class' => 'btn btn-success', 'name' => 'import_csv_submit']) ?>
+	<div class="form-group">
+		<?= Html::submitButton(Html::tag('i', '', ['class' => 'glyphicon glyphicon-save']) . ' Начать импорт', ['class' => 'btn btn-success', 'name' => 'import_csv_submit']) ?>
 	</div>
 	<?php ActiveForm::end(); ?>
 

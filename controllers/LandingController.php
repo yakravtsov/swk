@@ -80,6 +80,8 @@ class LandingController extends Controller
 		$searchModel  = new LandingSearch();
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+		$dataProvider->setSort(['defaultOrder' => ['request_id'=>SORT_DESC]]);
+
 		return $this->render('index', [
 			'searchModel'  => $searchModel,
 			'dataProvider' => $dataProvider,
@@ -231,13 +233,15 @@ class LandingController extends Controller
 	}
 
 	public function actionEmail(){
-		return $this->renderPartial('/landing/mail/blank');
+
 		/*$r = Yii::$app->mailer;
 		$r->setTransport(Yii::$app->params['emailRobotTransport']);
-		$r->compose('/landing/mail/blank')
-		  ->setFrom(Yii::$app->params['pochta'])
-		  ->setTo(['yakravtsov@gmail.com'])
-		  ->setSubject('Важная информация для администратора портфолио')
+		$r->compose('/landing/mail/spam', [])
+		  ->setFrom(Yii::$app->params['emailRobot'])
+		  ->setTo(['margaritaselez@gmail.com'])
+		  ->setSubject('Шаблон письма')
 		  ->send();*/
+
+		//return $this->renderPartial('/landing/mail/spam');
 	}
 }

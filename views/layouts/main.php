@@ -139,7 +139,7 @@ SCRIPT;
 	?>
 
 	<div class="container">
-<?if($university_exist && $university_id !== 7) {?>
+<?if($university_exist && $university_id !== 7 && $university_id !== 6 && $university_id !== 15 && $university_id !== 14) {?>
 		<div class="alert alert-warning text-center" role="alert">
 			<!--<div class="pull-right">
 				<a href="" class="btn btn-success">

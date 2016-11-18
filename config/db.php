@@ -2,9 +2,9 @@
 
 return [
 	'class' => 'yii\db\Connection',
-	'dsn' => 'pgsql:host=62.109.7.245;dbname=students',
-	'username' => 'pgsql',
-	'password' => '0000',
+	'dsn' => 'pgsql:host=localhost;dbname=students',
+	'username' => 'postgres',
+	'password' => 'sGXUXZLH9s',
 	'charset' => 'utf8',
 	'enableSchemaCache'=>false,
 	'schemaCacheDuration'=> YII_DEBUG ? 0 : 3600,
